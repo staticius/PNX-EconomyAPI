@@ -1,0 +1,5 @@
+name: WL-Economy
+author: Staticius
+version: "0.01"
+main: dev.kailyn.Main
+api: [ 2.0.0 ]
