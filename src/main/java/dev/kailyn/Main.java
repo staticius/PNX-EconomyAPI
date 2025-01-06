@@ -4,13 +4,20 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.commands.CommandMenu;
+import dev.kailyn.commands.CommandPay;
+import dev.kailyn.commands.CommandSeeMoney;
 import dev.kailyn.database.DatabaseConnect;
 import dev.kailyn.forms.FormMenu;
+import dev.kailyn.managers.EconomyManager;
+import dev.kailyn.managers.VaultManager;
 import dev.kailyn.tasks.DatabaseTaskManager;
 
 import java.sql.SQLException;
 
 public class Main extends PluginBase {
+
+    EconomyManager economyManager = new EconomyManager();
+    VaultManager vaultManager = new VaultManager();
 
     @Override
     public void onEnable() {
@@ -24,8 +31,7 @@ public class Main extends PluginBase {
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
-
-        EconomyAPI.init();
+        EconomyAPI.init(economyManager, vaultManager);
 
         registerCommands();
         registerEvents();
@@ -45,6 +51,8 @@ public class Main extends PluginBase {
 
     private void registerCommands() {
         this.getServer().getCommandMap().register("menu", new CommandMenu("menu", "Ekonomi Menüsü"));
+        this.getServer().getCommandMap().register("pay", new CommandPay("pay", "Para gönder"));
+        this.getServer().getCommandMap().register("seemoney", new CommandSeeMoney("seemoney", "Oyuncuların parasını görüntüle", "/seemoney <oyuncu>"));
     }
 
     private void registerEvents() {

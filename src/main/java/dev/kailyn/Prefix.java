@@ -7,4 +7,9 @@ public class Prefix {
         return PREFIX;
     }
 
+    public static String getMoneyUnit() {
+        final String MONEY_UNIT = "Wolf Coin";
+        return MONEY_UNIT;
+    }
+
 }
