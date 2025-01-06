@@ -1,43 +1,37 @@
 package dev.kailyn.api;
 
+import dev.kailyn.managers.EconomyManager;
+import dev.kailyn.managers.VaultManager;
+
 import java.util.List;
 
 public class EconomyAPI {
 
-    // Ekonomi İşlemleri
+    private static EconomyAPI instance;
+    private final EconomyManager economyManager;
+    private final VaultManager vaultManager;
 
-    public boolean transfer(String sender, String receiver, double amount) {
-        return false;
+    private EconomyAPI() {
+        this.economyManager = new EconomyManager();
+        this.vaultManager = new VaultManager();
     }
 
-    public double getBalance(String playerName) {
-        return 0;
+    public static void init() {
+        if (instance == null) {
+            instance = new EconomyAPI();
+        }
     }
 
-    public boolean deposit(String playerName, double amount) {
-        return false;
+    public static EconomyAPI getInstance() {
+        return instance;
     }
 
-    public boolean withdraw(String playerName, double amount) {
-        return false;
+    public EconomyManager getEconomyManager() {
+        return economyManager;
     }
 
-    // Ortak Kasa İşlemleri
-
-    public boolean createVault(String owner, List<String> members) {
-        return false;
-    }
-
-    public double getVaultBalance(String owner) {
-        return 0;
-    }
-
-    public boolean addVaultBalance(String owner, double amount) {
-        return false;
-    }
-
-    public List<String> getVaultMembers(String owner) {
-        return null;
+    public VaultManager getVaultManager() {
+        return vaultManager;
     }
 
 }

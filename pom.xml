@@ -44,6 +44,15 @@
             <version>master-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20241224</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -81,6 +90,10 @@
                 <version>3.5.1</version>
                 <configuration>
                     <!-- put your configurations here -->
+                    <transformers
+                            implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                        <resource>META-INF/services/java.sql.Driver</resource>
+                    </transformers>
                 </configuration>
                 <executions>
                     <execution>
@@ -92,6 +105,7 @@
                 </executions>
             </plugin>
         </plugins>
+
     </build>
 
 
