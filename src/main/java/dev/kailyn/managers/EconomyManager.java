@@ -1,6 +1,5 @@
 package dev.kailyn.managers;
 
-import dev.kailyn.Prefix;
 import dev.kailyn.database.DatabaseConnect;
 
 import java.sql.Connection;
@@ -10,20 +9,8 @@ import java.sql.SQLException;
 
 public class EconomyManager {
 
-    private void ensureConnection() {
-        try{
-            Connection connection = DatabaseConnect.getConnection();
-            if (connection != null || connection.isClosed()) {
-                DatabaseConnect.databaseConnect("/home/staticius/Masaüstü/Software/PNXSERVER/plugins/WL-Economy/economy.db");
-            }
-        } catch (SQLException e) {
-            logError(Prefix.getPrefix() + "Veritabanı bağlantısı kontrol edilemedi", e);
-        }
-    }
-
 
     public boolean createAccount(String playerName) {
-        ensureConnection();
         String sql = "INSERT OR IGNORE INTO Player (playerName, balance) VALUES (?, 0.0)";
 
         try (Connection connection = DatabaseConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -36,7 +23,7 @@ public class EconomyManager {
     }
 
     public double getBalance(String playerName) {
-        ensureConnection();
+
         String sql = "SELECT balance FROM player WHERE playerName = ?";
         try (Connection connection = DatabaseConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, playerName);
@@ -52,7 +39,6 @@ public class EconomyManager {
     }
 
     public boolean updateBalance(String playerName, double newBalance) {
-        ensureConnection();
         String sql = "INSERT OR REPLACE INTO Player (playerName, balance) VALUES (?, ?)";
 
         try (Connection connection = DatabaseConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -67,22 +53,19 @@ public class EconomyManager {
     }
 
     public boolean deposit(String playerName, double amount) {
-        ensureConnection();
         double balance = getBalance(playerName);
         return updateBalance(playerName, balance + amount);
     }
 
     public boolean withdraw(String playerName, double amount) {
-        ensureConnection();
         double currentBalance = getBalance(playerName);
-        if(currentBalance < amount) {
+        if (currentBalance < amount) {
             return false;
         }
         return updateBalance(playerName, currentBalance - amount);
     }
 
     public boolean transfer(String fromPlayerName, String toPlayerName, double amount) {
-        ensureConnection();
         if (withdraw(fromPlayerName, amount)) {
             return deposit(toPlayerName, amount);
         }

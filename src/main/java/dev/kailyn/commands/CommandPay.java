@@ -47,16 +47,16 @@ public class CommandPay extends Command {
             return false;
         }
 
-            double playerBalance = EconomyAPI.getInstance().getBalance(sender.getName());
+        double playerBalance = EconomyAPI.getInstance().getBalance(sender.getName());
 
-            if (playerBalance < amount) {
-                player.sendMessage(Prefix.getPrefix() + "Yeterli paran yok, Bakiyen: " + playerBalance);
-                return false;
-            }
+        if (playerBalance < amount) {
+            player.sendMessage(Prefix.getPrefix() + "Yeterli paran yok, Bakiyen: " + playerBalance);
+            return false;
+        }
 
-            economyAPI.transferMoney(sender.getName(), target.getName(), amount);
-            sender.sendMessage(Prefix.getPrefix() + target.getName() + " adlı oyuncuya " + amount + " " + Prefix.getMoneyUnit() + "gönderdin.");
-            target.sendMessage(Prefix.getPrefix() + sender.getName() + " adlı oyuncu sana " + amount + " " + Prefix.getMoneyUnit() + "gönderdi.");
+        economyAPI.transferMoney(sender.getName(), target.getName(), amount);
+        sender.sendMessage(Prefix.getPrefix() + target.getName() + " adlı oyuncuya " + amount + " " + Prefix.getMoneyUnit() + "gönderdin.");
+        target.sendMessage(Prefix.getPrefix() + sender.getName() + " adlı oyuncu sana " + amount + " " + Prefix.getMoneyUnit() + "gönderdi.");
 
         return true;
     }

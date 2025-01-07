@@ -3,7 +3,6 @@ package dev.kailyn.forms;
 import cn.nukkit.Player;
 import cn.nukkit.form.window.FormWindowSimple;
 import dev.kailyn.api.EconomyAPI;
-import dev.kailyn.managers.VaultManager;
 
 import java.sql.SQLException;
 import java.util.List;

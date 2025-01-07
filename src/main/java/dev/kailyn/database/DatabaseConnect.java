@@ -1,16 +1,32 @@
 package dev.kailyn.database;
 
-import java.sql.*;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class DatabaseConnect {
 
-    private static Connection connection;
+    private static HikariDataSource dataSource;
 
-    public static void databaseConnect(String dbPath) throws SQLException{
+    public static void databaseConnect(String dbPath) throws SQLException {
 
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl("jdbc:sqlite:" + dbPath);
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(2);
+            config.setIdleTimeout(30000);
+            config.setMaxLifetime(1800000);
+            config.setConnectionTimeout(30000);
+
+
+            dataSource = new HikariDataSource(config);
+
 
             createTables();
 
@@ -38,93 +54,110 @@ public class DatabaseConnect {
                     );
                 """;
 
-        connection.createStatement().execute(playerTable);
-        connection.createStatement().execute(vaultTable);
+        try (Connection connection = getConnection(); PreparedStatement playerStatement = connection.prepareStatement(playerTable); PreparedStatement vaultStatement = connection.prepareStatement(vaultTable)) {
+            playerStatement.execute();
+            vaultStatement.execute();
+        }
+
+
     }
 
     public static double getBalance(String playerName) throws SQLException {
-
         String sql = "SELECT balance FROM Player WHERE playerName = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setString(1, playerName);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            return resultSet.getDouble("balance");
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, playerName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getDouble("balance");
+            }
         }
-        return 0;
+        return 0.0;
     }
 
     public static void updateBalance(String playerName, double newBalance) throws SQLException {
         String sql = "UPDATE Player SET balance = ? WHERE playerName = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setDouble(1, newBalance);
-        preparedStatement.setString(2, playerName);
-        preparedStatement.executeUpdate();
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDouble(1, newBalance);
+            preparedStatement.setString(2, playerName);
+            preparedStatement.executeUpdate();
+
+        }
     }
+
 
     public static void closeConnection() throws SQLException {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (dataSource != null) {
+            dataSource.close();
         }
     }
 
-    public static Connection getConnection() {
-        return connection;
+    public static Connection getConnection() throws SQLException {
+
+        if (dataSource == null) {
+            throw new IllegalStateException("Veritabanı bağlantısı başarısız.");
+        }
+
+        return dataSource.getConnection();
+
     }
 
-    public static boolean vaultExists(String playerName) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Vaults WHERE ownerName = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, playerName);
+    /***
+     *
+     * @param ownerName
+     * @return Ortak kasa olup olmadığını kontrol eder
+     * @throws SQLException
+     */
+
+    public static boolean vaultExists(String ownerName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Vaults WHERE ownerName = ?)";
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, ownerName);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return resultSet.next() && resultSet.getInt(1) > 0;
         }
-        return false;
     }
 
+
+    /***
+     *
+     * @param ownerName
+     * @return Ortak Kasa üyelerini döndürür
+     * @throws SQLException
+     */
 
     public static Optional<String> getVaultMembers(String ownerName) throws SQLException {
         String sql = "SELECT members FROM Vaults WHERE ownerName = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, ownerName);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return Optional.of(resultSet.getString("members"));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return Optional.empty();
     }
 
-    /**
-     * Ortak kasayı oluşturur veya günceller.
+    /***
+     *
+     * @param ownerName
+     * @param memberJson
+     * @param totalBalance
+     * @return Ortak kasa oluşturur veya günceller
+     * @throws SQLException
      */
+
     public static boolean updateVault(String ownerName, String memberJson, double totalBalance) throws SQLException {
         String sql = """
                 INSERT OR REPLACE INTO Vaults (ownerName, members, totalBalance)
                 VALUES (?, ?, ?)
                 """;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, ownerName);
             preparedStatement.setString(2, memberJson);
             preparedStatement.setDouble(3, totalBalance);
             return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return false;
     }
-
-
 
 
 }

@@ -2,8 +2,6 @@ package dev.kailyn.managers;
 
 import dev.kailyn.database.DatabaseConnect;
 import org.json.JSONArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -81,7 +79,7 @@ public class VaultManager {
      * @param owner Kasa sahibi
      * @param newMember Kasaya eklenecek oyuncu
      * @return Kasaya oyuncuyu ekler
-     * @throws SQLException
+     * @throws SQLException e
      */
 
     public boolean addMemberToVault(String owner, String newMember) throws SQLException {
@@ -117,8 +115,8 @@ public class VaultManager {
 
     /***
      *
-     * @param owner
-     * @param members
+     * @param owner Kasa sahibi
+     * @param members Kasadaki oyuncular
      * @return Kasa oyuncularını günceller
      * @throws SQLException
      */
@@ -138,14 +136,19 @@ public class VaultManager {
 
     /***
      *
-     * @param owner
-     * @param amount
+     * @param owner Kasa sahibi
+     * @param amount Eklenecek miktar
      * @return Kasaya bakiye ekler
      * @throws SQLException
      */
 
     public boolean addBalanceToVault(String owner, double amount) throws SQLException {
         String sql = "UPDATE Vaults SET totalBalance = totalBalance + ? WHERE ownerName = ?";
+
+        if (amount <= 0) {
+            return false;
+        }
+
         try (Connection connection = DatabaseConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDouble(1, amount);
             preparedStatement.setString(2, owner);
@@ -160,7 +163,7 @@ public class VaultManager {
     /***
      *
      * @param message Hata mesajı
-     * @param e
+     * @param e .
      */
 
     private void logError(String message, SQLException e) {

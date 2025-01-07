@@ -39,18 +39,17 @@ public class EconomyAPI {
         DatabaseTaskManager.submitTask(() -> {
             if (economyManager.transfer(from, to, amount)) {
                 onSuccess.run();
-            }
-            else {
+            } else {
                 onFailure.run();
             }
         });
     }
 
-    public double getBalance(String playerName){
+    public double getBalance(String playerName) {
         return economyManager.getBalance(playerName);
     }
 
-    public void getBalanceAsync(String playerName, Consumer<Double> callback){
+    public void getBalanceAsync(String playerName, Consumer<Double> callback) {
         DatabaseTaskManager.submitTask(() -> {
             double balance = economyManager.getBalance(playerName);
             callback.accept(balance);

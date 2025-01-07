@@ -8,6 +8,7 @@ import dev.kailyn.commands.CommandPay;
 import dev.kailyn.commands.CommandSeeMoney;
 import dev.kailyn.database.DatabaseConnect;
 import dev.kailyn.forms.FormMenu;
+import dev.kailyn.listeners.ListenerCreateVault;
 import dev.kailyn.managers.EconomyManager;
 import dev.kailyn.managers.VaultManager;
 import dev.kailyn.tasks.DatabaseTaskManager;
@@ -57,6 +58,7 @@ public class Main extends PluginBase {
 
     private void registerEvents() {
         this.getServer().getPluginManager().registerEvents(new FormMenu(), this);
+        this.getServer().getPluginManager().registerEvents(new ListenerCreateVault(), this);
     }
 
 }

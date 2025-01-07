@@ -1,13 +1,20 @@
 package dev.kailyn.forms;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.inventory.ItemStackRequestActionEvent;
+import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.inventory.fake.FakeInventory;
 import cn.nukkit.inventory.fake.FakeInventoryType;
 import cn.nukkit.inventory.fake.ItemHandler;
 import cn.nukkit.item.Item;
 import cn.nukkit.utils.TextFormat;
+import dev.kailyn.Prefix;
+import dev.kailyn.api.EconomyAPI;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FormMenu implements Listener {
 
@@ -16,7 +23,7 @@ public class FormMenu implements Listener {
         FakeInventory fakeInventory = new FakeInventory(FakeInventoryType.HOPPER, "Ekonomi Menüsü");
 
         Item sendMoney = Item.get(Item.ARROW);
-        Item createVault = Item.get(Item.HEART_OF_THE_SEA);
+        Item createVault = Item.get(Block.BARREL);
         Item seeMoney = Item.get(Item.AMETHYST_SHARD);
         Item space = Item.get(Item.STAINED_GLASS_PANE);
 
@@ -39,16 +46,62 @@ public class FormMenu implements Listener {
             fakeInventory.setItemHandler(i, new ItemHandler() {
                 @Override
                 public void handle(FakeInventory fakeInventory, int slot, Item oldItem, Item newItem, ItemStackRequestActionEvent event) {
-                    if (fakeInventory.getTitle().contains("Ekonomi Menüsü")) {
-                        event.setCancelled(true);
+                    event.setCancelled(true);
+
+                    // Tıklanan item
+                    Item clickedItem = fakeInventory.getItem(slot);
+
+                    // Özel ad kontrolü
+                    if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Ortak Kasa Oluştur")) {
+                        fakeInventory.close(player);
+                        player.sendMessage(TextFormat.GREEN + "Ortak Kasa Oluştur seçildi!");
+
+                        // Online oyuncuları al
+                        //List<String> onlinePlayers = getOnlinePlayerNames(player);
+
+                        player.getServer().getScheduler().scheduleDelayedTask(() -> {
+                            FormVaultCreate formVaultCreate = new FormVaultCreate();
+                            formVaultCreate.open(player);
+                        }, 5);
+
+                        // Formu aç
+                        FormVaultCreate formVaultCreate = new FormVaultCreate();
+                        formVaultCreate.open(player);
+                    }
+
+                    if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiyeni Gör")) {
+                        fakeInventory.close(player);
+                        player.sendMessage(Prefix.getPrefix() + String.valueOf(EconomyAPI.getInstance().getBalance(player.getName())));
+                    }
+
+                    if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiye Gönder")) {
+                        fakeInventory.close(player);
+                        player.sendMessage("Yakında!");
+                    }
+
+                    if (clickedItem.getId() == null){
+                        fakeInventory.close(player);
+                        player.sendMessage("Sıkıntı büyük");
                     }
                 }
             });
-
-
         }
 
         return fakeInventory;
 
     }
+
+    private static List<String> getOnlinePlayerNames(Player currentPlayer) {
+        List<String> playerNames = new ArrayList<>();
+        for (Player player : currentPlayer.getServer().getOnlinePlayers().values()) {
+            if (!player.equals(currentPlayer)) {
+                playerNames.add(player.getName());
+            }
+        }
+        if (playerNames.isEmpty()) {
+            playerNames.add("Hiçbir oyuncu mevcut değil");
+        }
+        return playerNames;
+    }
+
 }
