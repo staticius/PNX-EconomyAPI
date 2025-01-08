@@ -2,12 +2,8 @@ package dev.kailyn.forms;
 
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.element.ElementDropdown;
-import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.utils.TextFormat;
-
-import java.util.List;
 
 public class FormVaultCreate {
 

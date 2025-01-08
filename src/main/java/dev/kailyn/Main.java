@@ -1,13 +1,15 @@
 package dev.kailyn;
 
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.registry.RegisterException;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.commands.CommandMenu;
-import dev.kailyn.commands.CommandPay;
 import dev.kailyn.commands.CommandSeeMoney;
 import dev.kailyn.database.DatabaseConnect;
 import dev.kailyn.forms.FormMenu;
+import dev.kailyn.items.ItemVault;
 import dev.kailyn.listeners.ListenerCreateVault;
 import dev.kailyn.managers.EconomyManager;
 import dev.kailyn.managers.VaultManager;
@@ -39,6 +41,16 @@ public class Main extends PluginBase {
     }
 
     @Override
+    public void onLoad() {
+        try {
+            Registries.ITEM.registerCustomItem(this, ItemVault.class);
+
+        } catch (RegisterException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void onDisable() {
         getLogger().info(TextFormat.RED + "-");
         try {
@@ -52,7 +64,6 @@ public class Main extends PluginBase {
 
     private void registerCommands() {
         this.getServer().getCommandMap().register("menu", new CommandMenu("menu", "Ekonomi Menüsü"));
-        this.getServer().getCommandMap().register("pay", new CommandPay("pay", "Para gönder"));
         this.getServer().getCommandMap().register("seemoney", new CommandSeeMoney("seemoney", "Oyuncuların parasını görüntüle", "/seemoney <oyuncu>"));
     }
 

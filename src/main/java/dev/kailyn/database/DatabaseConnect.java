@@ -3,6 +3,8 @@ package dev.kailyn.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +18,7 @@ public class DatabaseConnect {
     public static void databaseConnect(String dbPath) throws SQLException {
 
         try {
+
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:sqlite:" + dbPath);
             config.setMaximumPoolSize(10);
@@ -58,9 +61,26 @@ public class DatabaseConnect {
             playerStatement.execute();
             vaultStatement.execute();
         }
-
-
     }
+
+    /**
+     * Değerleri 2 ondalık basamağa yuvarlamak için yardımcı yöntem
+     *
+     * @param value Yuvarlanacak değer
+     * @return Yuvarlanan değer
+     */
+
+    /*private static double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+     */
+
+    public static double roundToTwoDecimals(double value) {
+        BigDecimal bigDecimal = new BigDecimal(Double.toString(value));
+        return bigDecimal.setScale(2, RoundingMode.HALF_UP).doubleValue();
+    }
+
 
     public static double getBalance(String playerName) throws SQLException {
         String sql = "SELECT balance FROM Player WHERE playerName = ?";
@@ -68,16 +88,23 @@ public class DatabaseConnect {
             preparedStatement.setString(1, playerName);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getDouble("balance");
+                return roundToTwoDecimals(resultSet.getDouble("balance"));
             }
         }
         return 0.0;
     }
 
+    /***
+     *
+     * @param playerName Bakiyesi güncellenecek oyuncu
+     * @param newBalance Güncellenmiş bakiye
+     * @throws SQLException Bir hata oluşursa
+     */
+
     public static void updateBalance(String playerName, double newBalance) throws SQLException {
         String sql = "UPDATE Player SET balance = ? WHERE playerName = ?";
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setDouble(1, newBalance);
+            preparedStatement.setDouble(1, roundToTwoDecimals(newBalance));
             preparedStatement.setString(2, playerName);
             preparedStatement.executeUpdate();
 
@@ -103,13 +130,13 @@ public class DatabaseConnect {
 
     /***
      *
-     * @param ownerName
+     * @param ownerName Kasa sahibi
      * @return Ortak kasa olup olmadığını kontrol eder
-     * @throws SQLException
+     * @throws SQLException Bir hata oluşursa
      */
 
     public static boolean vaultExists(String ownerName) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Vaults WHERE ownerName = ?)";
+        String sql = "SELECT COUNT(*) FROM Vaults WHERE ownerName = ?";
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, ownerName);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -120,9 +147,9 @@ public class DatabaseConnect {
 
     /***
      *
-     * @param ownerName
+     * @param ownerName Kasa sahibi
      * @return Ortak Kasa üyelerini döndürür
-     * @throws SQLException
+     * @throws SQLException Bir hata oluşursa
      */
 
     public static Optional<String> getVaultMembers(String ownerName) throws SQLException {
@@ -139,11 +166,11 @@ public class DatabaseConnect {
 
     /***
      *
-     * @param ownerName
-     * @param memberJson
-     * @param totalBalance
+     * @param ownerName Kasa sahibi
+     * @param memberJson Kasa üyelerinin tutulduğu JSON Array
+     * @param totalBalance Toplam bakiye
      * @return Ortak kasa oluşturur veya günceller
-     * @throws SQLException
+     * @throws SQLException Herhangi bir hata oluşursa
      */
 
     public static boolean updateVault(String ownerName, String memberJson, double totalBalance) throws SQLException {
@@ -154,7 +181,7 @@ public class DatabaseConnect {
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, ownerName);
             preparedStatement.setString(2, memberJson);
-            preparedStatement.setDouble(3, totalBalance);
+            preparedStatement.setDouble(3, roundToTwoDecimals(totalBalance));
             return preparedStatement.executeUpdate() > 0;
         }
     }

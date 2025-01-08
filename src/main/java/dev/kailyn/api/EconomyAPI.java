@@ -30,9 +30,26 @@ public class EconomyAPI {
         return instance;
     }
 
+    /***
+     *
+     * @param from Transfer EDECEK oyuncu
+     * @param to Transfer ALACAK oyuncu
+     * @param amount Miktar
+     * @return Transfer işlemi
+     */
+
     public boolean transferMoney(String from, String to, double amount) {
         return economyManager.transfer(from, to, amount);
     }
+
+    /*** Bakiyeyi async olarak transfer et. (Sunucunun main threadine girmeden ayrı threadde işlem yapar daha temizdir)
+     *
+     * @param from Transfer EDECEK oyuncu
+     * @param to Transfer ALACAK oyuncu
+     * @param amount Miktar
+     * @param onSuccess Başarı durumunda
+     * @param onFailure Hata durumunda
+     */
 
     public void transferMoneyAsync(String from, String to, double amount, Runnable onSuccess, Runnable onFailure) {
 
@@ -45,9 +62,21 @@ public class EconomyAPI {
         });
     }
 
+    /***
+     *
+     * @param playerName Oyuncunun adı ( player.getName(); )
+     * @return Bakiyeyi al
+     */
+
     public double getBalance(String playerName) {
         return economyManager.getBalance(playerName);
     }
+
+    /*** Bakiyeyi async olarak al.(Sunucunun main thread ine girmeden ayrı threadde işlem yapar daha temizdir)
+     *
+     * @param playerName Oyuncu adı
+     * @param callback Geri dönüş
+     */
 
     public void getBalanceAsync(String playerName, Consumer<Double> callback) {
         DatabaseTaskManager.submitTask(() -> {

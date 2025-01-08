@@ -23,17 +23,17 @@ public class ListenerCreateVault implements Listener {
         deneme.add("Staticius");
         deneme.add("HardSiamang655");
 
+
         String members = new JSONArray(deneme).toString();
 
         if (event.getFormID() == FormVaultCreate.FORM_ID) {
             Player player = event.getPlayer();
             Object response = event.getResponse();
 
-            if (response instanceof FormResponseSimple) {
-                FormResponseSimple formResponse = (FormResponseSimple) response;
+            if (response instanceof FormResponseSimple formResponse) {
                 int responseId = formResponse.getClickedButtonId();
 
-                try{
+                try {
                     if (responseId == 0) { //Evet Seçeneği
                         EconomyAPI.getInstance().getVaultManager().createVault(player.getName(), deneme);
                     } else if (responseId == 1) { // Hayır seçeneği

@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.inventory.ItemStackRequestActionEvent;
-import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.inventory.fake.FakeInventory;
 import cn.nukkit.inventory.fake.FakeInventoryType;
 import cn.nukkit.inventory.fake.ItemHandler;
@@ -23,7 +22,7 @@ public class FormMenu implements Listener {
         FakeInventory fakeInventory = new FakeInventory(FakeInventoryType.HOPPER, "Ekonomi Menüsü");
 
         Item sendMoney = Item.get(Item.ARROW);
-        Item createVault = Item.get(Block.BARREL);
+        Item createVault = Item.get("wolfland:banka_img");
         Item seeMoney = Item.get(Item.AMETHYST_SHARD);
         Item space = Item.get(Item.STAINED_GLASS_PANE);
 
@@ -54,7 +53,6 @@ public class FormMenu implements Listener {
                     // Özel ad kontrolü
                     if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Ortak Kasa Oluştur")) {
                         fakeInventory.close(player);
-                        player.sendMessage(TextFormat.GREEN + "Ortak Kasa Oluştur seçildi!");
 
                         // Online oyuncuları al
                         //List<String> onlinePlayers = getOnlinePlayerNames(player);
@@ -71,15 +69,20 @@ public class FormMenu implements Listener {
 
                     if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiyeni Gör")) {
                         fakeInventory.close(player);
-                        player.sendMessage(Prefix.getPrefix() + String.valueOf(EconomyAPI.getInstance().getBalance(player.getName())));
+                        player.sendMessage(Prefix.getPrefix() + EconomyAPI.getInstance().getBalance(player.getName()));
                     }
 
                     if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiye Gönder")) {
                         fakeInventory.close(player);
-                        player.sendMessage("Yakında!");
+
+                        player.getServer().getScheduler().scheduleDelayedTask(() -> {
+                            FormSendMoney formSendMoney = new FormSendMoney();
+                            formSendMoney.sendMoneyForm(player);
+                        }, 5);
+
                     }
 
-                    if (clickedItem.getId() == null){
+                    if (clickedItem.getId() == null) {
                         fakeInventory.close(player);
                         player.sendMessage("Sıkıntı büyük");
                     }
