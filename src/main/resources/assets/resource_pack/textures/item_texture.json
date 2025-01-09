@@ -1,5 +1,8 @@
 {
 	"texture_data": {
+		"space": {
+			"textures": "textures/items/space.png"
+		},
 		"banka_img": {
 			"textures": "textures/items/banka_img.png"
 		}

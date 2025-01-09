@@ -1,18 +1,24 @@
 {
-  "format_version": 2,
-  "header": {
-    "name": "WolfLand",
-    "description": "WL-Economy Items",
-    "uuid": "79d6f679-9aa0-47ee-ae7d-969b7d361a22",
-    "version": [0, 1, 2],
-    "min_engine_version": [1, 16, 0]
-  },
-  "modules": [
-    {
-      "description": "MT",
-      "type": "resources",
-      "uuid": "57edbaee-4d0e-435a-a0c3-b907e11d5f7e",
-      "version": [1, 0, 0]
-    }
-  ]
+	"format_version": 2,
+	"header": {
+		"name": "WolfLand-Economy-Items",
+		"description": "WolfLand-Economy-Items Resource Pack",
+		"uuid": "1a39266e-856f-6731-bd93-7f98090b2e54",
+		"version": [1, 0, 1],
+		"min_engine_version": [1, 16, 0]
+	},
+	"metadata": {
+		"authors": ["Staticius"],
+		"generated_with": {
+			"blockbench_item_wizard": ["1.1.0"]
+		}
+	},
+	"modules": [
+		{
+			"description": "WolfLand-Economy-Items",
+			"type": "resources",
+			"uuid": "a4ecbd6d-698f-f66f-1bc4-6a00594bec79",
+			"version": [1, 0, 0]
+		}
+	]
 }

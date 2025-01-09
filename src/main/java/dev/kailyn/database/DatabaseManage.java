@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class DatabaseConnect {
+public class DatabaseManage {
 
     private static HikariDataSource dataSource;
 
@@ -63,19 +63,29 @@ public class DatabaseConnect {
         }
     }
 
+
+    public static Connection getConnection() throws SQLException {
+
+        if (dataSource == null) {
+            throw new IllegalStateException("Veritabanı bağlantısı başarısız.");
+        }
+
+        return dataSource.getConnection();
+
+    }
+
+    public static void closeConnection() throws SQLException {
+        if (dataSource != null) {
+            dataSource.close();
+        }
+    }
+
     /**
      * Değerleri 2 ondalık basamağa yuvarlamak için yardımcı yöntem
      *
      * @param value Yuvarlanacak değer
      * @return Yuvarlanan değer
      */
-
-    /*private static double roundToTwoDecimals(double value) {
-        return Math.round(value * 100.0) / 100.0;
-    }
-
-     */
-
     public static double roundToTwoDecimals(double value) {
         BigDecimal bigDecimal = new BigDecimal(Double.toString(value));
         return bigDecimal.setScale(2, RoundingMode.HALF_UP).doubleValue();
@@ -112,35 +122,68 @@ public class DatabaseConnect {
     }
 
 
-    public static void closeConnection() throws SQLException {
-        if (dataSource != null) {
-            dataSource.close();
-        }
-    }
-
-    public static Connection getConnection() throws SQLException {
-
-        if (dataSource == null) {
-            throw new IllegalStateException("Veritabanı bağlantısı başarısız.");
-        }
-
-        return dataSource.getConnection();
-
-    }
-
-    /***
+    /**
+     * Ortak kasanın tüm bilgilerini günceller (üyeler ve toplam bakiye).
      *
-     * @param ownerName Kasa sahibi
-     * @return Ortak kasa olup olmadığını kontrol eder
-     * @throws SQLException Bir hata oluşursa
+     * @param ownerName    Kasa sahibi
+     * @param membersJson  Kasa üyelerini temsil eden JSON dizisi
+     * @param totalBalance Yeni toplam bakiye
+     * @return Güncelleme başarılıysa true, aksi halde false
+     * @throws SQLException Eğer veritabanı hatası olursa
      */
-
-    public static boolean vaultExists(String ownerName) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Vaults WHERE ownerName = ?";
+    public static boolean updateVault(String ownerName, String membersJson, double totalBalance) throws SQLException {
+        String sql = """
+                UPDATE Vaults 
+                SET members = ?, totalBalance = ? 
+                WHERE ownerName = ?
+                """;
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, ownerName);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.next() && resultSet.getInt(1) > 0;
+            preparedStatement.setString(1, membersJson);
+            preparedStatement.setDouble(2, roundToTwoDecimals(totalBalance));
+            preparedStatement.setString(3, ownerName);
+            return preparedStatement.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Ortak kasanın üyelerini günceller.
+     *
+     * @param ownerName   Kasa sahibi
+     * @param membersJson Kasa üyelerini temsil eden JSON dizisi
+     * @return Güncelleme başarılıysa true, aksi halde false
+     * @throws SQLException Eğer veritabanı hatası olursa
+     */
+    public static boolean updateVault(String ownerName, String membersJson) throws SQLException {
+        String sql = """
+                UPDATE Vaults 
+                SET members = ? 
+                WHERE ownerName = ?
+                """;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, membersJson);
+            preparedStatement.setString(2, ownerName);
+            return preparedStatement.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Ortak kasanın toplam bakiyesini günceller.
+     *
+     * @param ownerName    Kasa sahibi
+     * @param totalBalance Yeni toplam bakiye
+     * @return Güncelleme başarılıysa true, aksi halde false
+     * @throws SQLException Eğer veritabanı hatası olursa
+     */
+    public static boolean updateVault(String ownerName, double totalBalance) throws SQLException {
+        String sql = """
+                UPDATE Vaults 
+                SET totalBalance = ? 
+                WHERE ownerName = ?
+                """;
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDouble(1, roundToTwoDecimals(totalBalance));
+            preparedStatement.setString(2, ownerName);
+            return preparedStatement.executeUpdate() > 0;
         }
     }
 
@@ -164,25 +207,42 @@ public class DatabaseConnect {
         return Optional.empty();
     }
 
+
+    /**
+     * Bir ortak kasanın toplam bakiyesini döndürür.
+     *
+     * @param ownerName Kasa sahibi
+     * @return Toplam bakiye (2 ondalık basamağa yuvarlanmış)
+     * @throws SQLException Eğer veritabanı hatası olursa
+     */
+    public static double getVaultTotalBalance(String ownerName) throws SQLException {
+        String sql = "SELECT totalBalance FROM Vaults WHERE ownerName = ?";
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, ownerName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                double totalBalance = resultSet.getDouble("totalBalance");
+                return roundToTwoDecimals(totalBalance);
+            }
+        }
+        return 0.0;
+    }
+
+
     /***
      *
      * @param ownerName Kasa sahibi
-     * @param memberJson Kasa üyelerinin tutulduğu JSON Array
-     * @param totalBalance Toplam bakiye
-     * @return Ortak kasa oluşturur veya günceller
-     * @throws SQLException Herhangi bir hata oluşursa
+     * @return Ortak kasa olup olmadığını kontrol eder
+     * @throws SQLException Bir hata oluşursa
      */
 
-    public static boolean updateVault(String ownerName, String memberJson, double totalBalance) throws SQLException {
-        String sql = """
-                INSERT OR REPLACE INTO Vaults (ownerName, members, totalBalance)
-                VALUES (?, ?, ?)
-                """;
+    public static boolean vaultExists(String ownerName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Vaults WHERE ownerName = ?";
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, ownerName);
-            preparedStatement.setString(2, memberJson);
-            preparedStatement.setDouble(3, roundToTwoDecimals(totalBalance));
-            return preparedStatement.executeUpdate() > 0;
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next() && resultSet.getInt(1) > 0;
         }
     }
 

@@ -7,8 +7,9 @@ import cn.nukkit.utils.TextFormat;
 import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.commands.CommandMenu;
 import dev.kailyn.commands.CommandSeeMoney;
-import dev.kailyn.database.DatabaseConnect;
+import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormMenu;
+import dev.kailyn.items.ItemSpace;
 import dev.kailyn.items.ItemVault;
 import dev.kailyn.listeners.ListenerCreateVault;
 import dev.kailyn.managers.EconomyManager;
@@ -28,7 +29,7 @@ public class Main extends PluginBase {
 
 
         try {
-            DatabaseConnect.databaseConnect(getDataFolder().getAbsolutePath() + "/economy.db");
+            DatabaseManage.databaseConnect(getDataFolder().getAbsolutePath() + "/economy.db");
         } catch (SQLException e) {
             getLogger().error("Veritabanı bağlantısında bir sorun oluştu!", e.getCause());
             this.getServer().getPluginManager().disablePlugin(this);
@@ -44,7 +45,7 @@ public class Main extends PluginBase {
     public void onLoad() {
         try {
             Registries.ITEM.registerCustomItem(this, ItemVault.class);
-
+            Registries.ITEM.registerCustomItem(this, ItemSpace.class);
         } catch (RegisterException e) {
             throw new RuntimeException(e);
         }
@@ -54,7 +55,7 @@ public class Main extends PluginBase {
     public void onDisable() {
         getLogger().info(TextFormat.RED + "-");
         try {
-            DatabaseConnect.closeConnection();
+            DatabaseManage.closeConnection();
         } catch (SQLException e) {
             getLogger().error("Veritabanı bağlantısı kapatılırken bir sorun oluştu!", e.getCause());
         }

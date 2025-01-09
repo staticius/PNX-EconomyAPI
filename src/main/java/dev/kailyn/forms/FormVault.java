@@ -2,6 +2,7 @@ package dev.kailyn.forms;
 
 import cn.nukkit.Player;
 import cn.nukkit.form.window.FormWindowSimple;
+import cn.nukkit.utils.TextFormat;
 import dev.kailyn.api.EconomyAPI;
 
 import java.sql.SQLException;
@@ -14,7 +15,7 @@ public class FormVault {
         List<String> members = EconomyAPI.getInstance().getVaultManager().getVaultMembers(player.getName());
 
         if (members.isEmpty()) {
-            FormWindowSimple createVaultWindow = new FormWindowSimple("Kasa Oluştur", "Henüz bir kasanız yok. Yeni bir kasa oluşturabilirsiniz.");
+            FormWindowSimple createVaultWindow = new FormWindowSimple(TextFormat.BOLD + "Kasa", "");
             player.showFormWindow(createVaultWindow);
         } else {
             StringBuilder details = new StringBuilder("Kasanızdaki Oyuncular:\n");

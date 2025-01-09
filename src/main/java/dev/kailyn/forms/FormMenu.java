@@ -1,7 +1,6 @@
 package dev.kailyn.forms;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.Block;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.inventory.ItemStackRequestActionEvent;
 import cn.nukkit.inventory.fake.FakeInventory;
@@ -11,6 +10,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.api.EconomyAPI;
+import dev.kailyn.database.DatabaseManage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +24,10 @@ public class FormMenu implements Listener {
         Item sendMoney = Item.get(Item.ARROW);
         Item createVault = Item.get("wolfland:banka_img");
         Item seeMoney = Item.get(Item.AMETHYST_SHARD);
-        Item space = Item.get(Item.STAINED_GLASS_PANE);
+        Item space = Item.get("wolfland:space");
 
         sendMoney.setCustomName(TextFormat.YELLOW + "Bakiye Gönder");
-        createVault.setCustomName(TextFormat.YELLOW + "Ortak Kasa Oluştur");
+        createVault.setCustomName(TextFormat.YELLOW + "Kasa Oluştur");
         seeMoney.setCustomName(TextFormat.YELLOW + "Bakiyeni Gör");
         space.setCustomName(" ");
 
@@ -51,7 +51,7 @@ public class FormMenu implements Listener {
                     Item clickedItem = fakeInventory.getItem(slot);
 
                     // Özel ad kontrolü
-                    if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Ortak Kasa Oluştur")) {
+                    if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Kasa Oluştur")) {
                         fakeInventory.close(player);
 
                         // Online oyuncuları al

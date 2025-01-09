@@ -1,6 +1,6 @@
 package dev.kailyn.managers;
 
-import dev.kailyn.database.DatabaseConnect;
+import dev.kailyn.database.DatabaseManage;
 import org.json.JSONArray;
 
 import java.sql.Connection;
@@ -16,7 +16,7 @@ public class VaultManager {
     /**
      * Yeni bir ortak kasa oluşturur.
      *
-     * @param owner   Kasa sahibi
+     * @param owner Kasa sahibi
      * @param members Kasa üyeleri
      * @return Kasa oluşturulduysa true, aksi halde false
      * @throws SQLException Eğer veritabanı hatası olursa
@@ -37,7 +37,7 @@ public class VaultManager {
         String sql = "INSERT INTO Vaults (ownerName, members, totalBalance) VALUES (?, ?, ?)";
 
         // Try-with-resources ile kaynak yönetimi
-        try (PreparedStatement preparedStatement = DatabaseConnect.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = DatabaseManage.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, owner);
             preparedStatement.setString(2, membersArray.toString());
             preparedStatement.setDouble(3, 0.0);
@@ -57,7 +57,7 @@ public class VaultManager {
         List<String> members = new ArrayList<>();
         String sql = "SELECT members FROM Vaults WHERE ownerName = ?";
 
-        try (PreparedStatement preparedStatement = DatabaseConnect.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = DatabaseManage.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, owner);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -73,6 +73,18 @@ public class VaultManager {
         }
         return members;
     }
+
+    /**
+     * Ortak kasanın toplam bakiyesini döndürür.
+     *
+     * @param owner Kasa sahibi
+     * @return Toplam bakiye
+     * @throws SQLException Eğer veritabanı hatası olursa
+     */
+    public double getVaultTotalBalance(String owner) throws SQLException {
+        return DatabaseManage.getVaultTotalBalance(owner);
+    }
+
 
     /***
      *
@@ -122,15 +134,8 @@ public class VaultManager {
      */
 
     public boolean updateVaultMembers(String owner, List<String> members) throws SQLException {
-        JSONArray jsonArray = new JSONArray(members);
-        String sql = "UPDATE Vaults SET members = ? WHERE ownerName = ?";
-        try (Connection connection = DatabaseConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, jsonArray.toString());
-            preparedStatement.setString(2, owner);
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            logError("Kasa üyeleri güncellenirken bir sorun oluştu!", e);
-            return false;
+        try {
+            DatabaseManage.updateVaultMembers(owner, String.valueOf(members));
         }
     }
 
@@ -149,7 +154,7 @@ public class VaultManager {
             return false;
         }
 
-        try (Connection connection = DatabaseConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseManage.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDouble(1, amount);
             preparedStatement.setString(2, owner);
             return preparedStatement.executeUpdate() > 0;

@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.kailyn</groupId>
-    <artifactId>Wl-EconomyAPI</artifactId>
-    <version>0.01 'Staticius'</version>
+    <artifactId>WolfLand-EconomyAPI</artifactId>
+    <version>0.01</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
