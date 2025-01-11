@@ -11,13 +11,20 @@ import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.api.EconomyAPI;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FormSendMoney implements Listener {
 
-    public static final int SEND_MONEY_FORM_ID = 12;
+    public static final int SEND_MONEY_FORM_ID = 7;
+
+
+    @NotNull
+    static List<String> getStrings(Player currentPlayer) {
+        return FormEcoAdmin.getStrings(currentPlayer);
+    }
 
     public void sendMoneyForm(Player player) {
 
@@ -25,14 +32,14 @@ public class FormSendMoney implements Listener {
 
         List<String> unit = new ArrayList<>();
         List<String> players = new ArrayList<>();
-        players.add(server.getOnlinePlayers().toString());
         unit.add("Tam Miktar");
         unit.add("K (Bin)");
         unit.add("M (Milyon)");
 
-        FormWindowCustom formWindowCustom = new FormWindowCustom(TextFormat.BOLD + "Para Gönder");
 
-        formWindowCustom.addElement(new ElementDropdown("Gönderilecek Oyuncu:", players));
+        FormWindowCustom formWindowCustom = new FormWindowCustom("Para Gönder");
+
+        formWindowCustom.addElement(new ElementDropdown("Gönderilecek Oyuncu:", getStrings(player)));
 
         formWindowCustom.addElement(new ElementInput("Miktar", "Gönderilecek Miktar"));
 
@@ -48,11 +55,6 @@ public class FormSendMoney implements Listener {
         if (event.getFormID() == SEND_MONEY_FORM_ID) {
 
             FormWindowCustom window = (FormWindowCustom) event.getWindow();
-
-            if (window == null || event.wasClosed()) {
-                player.sendMessage(TextFormat.RED + "X");
-                return;
-            }
 
             String selectedPlayer = window.getResponse().getDropdownResponse(0).getElementContent();
             String amount = window.getResponse().getInputResponse(1);
@@ -82,6 +84,12 @@ public class FormSendMoney implements Listener {
             EconomyAPI.getInstance().transferMoney(player.getName(), selectedPlayer, parsedAmount);
 
             player.sendMessage(Prefix.getPrefix() + selectedPlayer + " adlı oyuncuya " + amount + " " + unit + " " + Prefix.getMoneyUnit() + "gönderdin.");
+
+            // Alıcı oyuncuya mesaj gönderme
+            Player receiver = Server.getInstance().getPlayer(selectedPlayer);
+            if (receiver != null && receiver.isOnline()) {
+                receiver.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + player.getName() + " size " + amount + " " + unit + " " + Prefix.getMoneyUnit() + " gönderdi.");
+            }
 
         }
     }

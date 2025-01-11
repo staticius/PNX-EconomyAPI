@@ -1,10 +1,22 @@
 {
-	"texture_data": {
-		"space": {
-			"textures": "textures/items/space.png"
-		},
-		"banka_img": {
-			"textures": "textures/items/banka_img.png"
-		}
-	}
+  "texture_data": {
+    "soruisareti": {
+      "textures": "textures/items/soruisareti.png"
+    },
+    "space": {
+      "textures": "textures/items/space.png"
+    },
+    "banka_img": {
+      "textures": "textures/items/banka_img.png"
+    },
+    "uye_ekle": {
+      "textures": "textures/items/uyeekle.png"
+    },
+    "uye_cikar": {
+      "textures": "textures/items/uyecikar.png"
+    },
+    "oyuncu_parasi": {
+      "textures": "textures/items/oyuncuparasi.png"
+    }
+  }
 }

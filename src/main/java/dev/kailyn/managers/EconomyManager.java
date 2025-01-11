@@ -23,9 +23,8 @@ public class EconomyManager {
 
     public double getBalance(String playerName) {
         try {
-            return DatabaseManage.roundToTwoDecimals(DatabaseManage.getBalance(playerName));
-        }
-        catch (SQLException e) {
+            return DatabaseManage.getBalance(playerName);
+        } catch (SQLException e) {
             logError("Bakiye alınırken hata oluştu.", e);
         }
         return 0.0;
@@ -35,8 +34,7 @@ public class EconomyManager {
         try {
             DatabaseManage.updateBalance(playerName, newBalance);
             return true;
-        }
-        catch (SQLException exception) {
+        } catch (SQLException exception) {
             logError("Bakiye güncellenirken hata oluştu.", exception);
             return false;
         }

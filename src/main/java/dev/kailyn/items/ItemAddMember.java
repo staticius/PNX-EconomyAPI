@@ -3,22 +3,23 @@ package dev.kailyn.items;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.item.customitem.data.CreativeCategory;
+import org.jetbrains.annotations.NotNull;
 
-public class ItemSpace extends ItemCustom {
-    public ItemSpace() {
-        super("wolfland:space");
+public class ItemAddMember extends ItemCustom {
+
+    public ItemAddMember() {
+        super("wolfland:add_member");
     }
 
     @Override
     public CustomItemDefinition getDefinition() {
         return CustomItemDefinition
                 .customBuilder(this)
-                .texture("space")
-                .name("Boşluk")
+                .texture("uye_ekle")
+                .name("Üye Ekle")
                 .allowOffHand(false)
                 .creativeCategory(CreativeCategory.ITEMS)
                 .build();
-
     }
 
     @Override
