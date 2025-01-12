@@ -2,6 +2,7 @@ package dev.kailyn.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 
 import java.sql.Connection;
@@ -16,55 +17,56 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class DatabaseManage {
-
     private static HikariDataSource dataSource;
 
-    public static void databaseConnect(String dbPath) throws SQLException {
-
+    public static void databaseConnect(String dbPath) {
         try {
+            // Veritabanı bağlantı dizesini kontrol et
+            if (!dbPath.startsWith("jdbc:sqlite:")) {
+                dbPath = "jdbc:sqlite:" + dbPath;
+            }
 
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:sqlite:" + dbPath);
-            config.setMaximumPoolSize(10);
-            config.setMinimumIdle(2);
-            config.setIdleTimeout(30000);
-            config.setMaxLifetime(1800000);
-            config.setConnectionTimeout(30000);
-
+            HikariConfig config = getHikariConfig(dbPath);
 
             dataSource = new HikariDataSource(config);
 
-
+            // Tablo oluşturma işlemi
             createTables();
+        } catch (Exception e) {
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Veritabanına bağlanırken bir hata oluştu: " + e.getMessage(), e);
         }
-
     }
+
+    private static @NotNull HikariConfig getHikariConfig(String dbPath) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(dbPath);
+
+        // HikariCP yapılandırmaları
+        config.setMaximumPoolSize(8);       // Maksimum 8 bağlantı
+        config.setMinimumIdle(4);          // Minimum 4 bağlantı
+        config.setIdleTimeout(30000);      // Boşta kalma süresi: 30 saniye
+        config.setMaxLifetime(1800000);    // Maksimum yaşam süresi: 30 dakika
+        config.setConnectionTimeout(10000); // Bağlantı süresi: 10 saniye
+        return config;
+    }
+
 
     private static void createTables() throws SQLException {
         String playerTable = """
                 CREATE TABLE IF NOT EXISTS Player (
-                    id         INTEGER PRIMARY KEY AUTOINCREMENT
-                                       UNIQUE,
-                    playerName TEXT    UNIQUE
-                                       NOT NULL,
-                    balance    REAL    NOT NULL
-                                       DEFAULT 0.0
+                    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                    playerName TEXT    NOT NULL UNIQUE,
+                    balance    REAL    NOT NULL DEFAULT 0.0
                 );
                 """;
 
         String vaultTable = """
                 CREATE TABLE IF NOT EXISTS Vaults (
-                    vaultId      INTEGER PRIMARY KEY AUTOINCREMENT
-                                         UNIQUE
-                                         NOT NULL,
-                    ownerName    TEXT    NOT NULL
-                                         UNIQUE,
-                    members      TEXT    UNIQUE,
-                    totalBalance REAL    NOT NULL
-                                         DEFAULT 0.0
+                    vaultId      INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ownerName    TEXT    NOT NULL UNIQUE,
+                    members      TEXT,
+                    totalBalance REAL    NOT NULL DEFAULT 0.0
                 );
                 """;
 
@@ -115,6 +117,42 @@ public class DatabaseManage {
         }
         return 0.0;
     }
+
+    /*** Oyuncu oyuna ilk girişinde veritabanına bakiye kaydı yapma
+     *
+     * @param playerName hesap oluşturulacak Oyuncunun adı
+     * @return Hesap oluşturulursa true oluşturulmazsa false
+     * @throws SQLException veritabanı hatalarına karşı
+     */
+    public static boolean createPlayerAccount(String playerName) throws SQLException {
+        String sql = "INSERT INTO Player (playerName, balance) VALUES (?, 0.0)";
+
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, playerName);
+            return preparedStatement.executeUpdate() > 0; // Kayıt oluşturulduysa `true` döner
+        }
+    }
+
+
+    /*** Oyuncunun sunucuda kayıtlı olup olmadığını döndür
+     *
+     * @param playerName Kontrol edilecek oyuncunun adı
+     * @return Eğer kayıt varsa true yoksa false döner
+     * @throws SQLException Veritabanı hatalarına karşı
+     */
+
+    public static boolean isPlayerRegistered(String playerName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Player WHERE playerName = ?";
+
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, playerName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Eğer kayıt varsa `true`, yoksa `false` döner
+            return resultSet.next() && resultSet.getInt(1) > 0;
+        }
+    }
+
 
     /***
      *
@@ -224,7 +262,7 @@ public class DatabaseManage {
      * Bir ortak kasanın toplam bakiyesini döndürür.
      *
      * @param ownerName Kasa sahibi
-     * @return Toplam bakiye (2 ondalık basamağa yuvarlanmış)
+     * @return Toplam bakiye
      * @throws SQLException Eğer veritabanı hatası olursa
      */
     public static double getVaultTotalBalance(String ownerName) throws SQLException {
@@ -485,7 +523,7 @@ public class DatabaseManage {
 
     public static boolean createVault(String ownerName) throws SQLException {
 
-        if (vaultExists(ownerName)) {
+        if (vaultExists(ownerName) || isVaultMember(ownerName)) {
             return false; // Kasa zaten var, yeni kasa oluşturulmaz.
         }
 
@@ -515,6 +553,28 @@ public class DatabaseManage {
         return decimalFormat.format(value);
     }
 
+    public static List<String> getAllVaultOwnersAndMembers() throws SQLException {
+        List<String> vaultOwnersAndMembers = new ArrayList<>();
+
+        String sql = "SELECT ownerName, members FROM Vaults";
+        try (Connection connection = DatabaseManage.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql); ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                // Kasa sahibini ekle
+                vaultOwnersAndMembers.add(resultSet.getString("ownerName"));
+
+                // Üyeleri ekle
+                String membersJson = resultSet.getString("members");
+                JSONArray membersArray = new JSONArray(membersJson);
+
+                for (int i = 0; i < membersArray.length(); i++) {
+                    vaultOwnersAndMembers.add(membersArray.getString(i));
+                }
+            }
+        }
+
+        return vaultOwnersAndMembers;
+    }
 
 
 }

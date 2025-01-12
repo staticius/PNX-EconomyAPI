@@ -14,50 +14,69 @@ public class FormAddVaultMember {
 
     private static final int ADD_MEMBER_MENU_ID = 1;
 
+    /**
+     * Oyuncu için "Eklenecek Oyuncular" menüsünü açar.
+     *
+     * @param player Oyuncu
+     */
     public static void openAddMemberMenu(Player player) {
+        try {
+            // Aktif oyuncuları al
+            List<String> activePlayers = getOnlinePlayerNames(player);
 
-        //Aktif oyuncular
-        List<String> activePlayers = getOnlinePlayerNames(player);
+            // Uygun oyuncuları filtrele
+            List<String> filteredPlayers = getEligiblePlayers(activePlayers);
 
-        //Kasa sahibi ve üye olan oyuncuları filtrele
-        List<String> filteredPlayers = filterEligiblePlayers(activePlayers);
+            // Uygun oyuncu yoksa bilgilendir
+            if (filteredPlayers.isEmpty()) {
+                player.sendMessage(Prefix.getPrefix() + "Eklenebilecek oyuncu yok.");
+                return;
+            }
 
-        if (filteredPlayers.isEmpty()) {
-            player.sendMessage(Prefix.getPrefix() + "Eklenebilecek oyuncu yok.");
-            return;
+            // Formu oluştur ve oyuncuya göster
+            FormWindowCustom formWindowCustom = new FormWindowCustom("Eklenecek Oyuncular");
+            formWindowCustom.addElement(new ElementDropdown("Eklenecek Oyuncu", filteredPlayers));
+            player.showFormWindow(formWindowCustom, ADD_MEMBER_MENU_ID);
+
+        } catch (SQLException e) {
+            player.sendMessage(Prefix.getPrefix() + "Oyuncu listesi alınırken bir hata oluştu.");
+            e.printStackTrace();
         }
-
-        FormWindowCustom formWindowCustom = new FormWindowCustom("Eklenecek Oyuncular");
-        formWindowCustom.addElement(new ElementDropdown("Eklenecek Oyuncu", filteredPlayers));
-
-        player.showFormWindow(formWindowCustom, ADD_MEMBER_MENU_ID);
-
     }
 
+    /**
+     * Oyuncunun çevrimiçi oyuncular listesini alır (kendisi hariç).
+     *
+     * @param currentPlayer Oyuncu
+     * @return Çevrimiçi oyuncular listesi
+     */
     private static List<String> getOnlinePlayerNames(Player currentPlayer) {
         List<String> playerNames = new ArrayList<>();
         for (Player player : currentPlayer.getServer().getOnlinePlayers().values()) {
-            // Mevcut oyuncuyu kendisiyle eşleşmesin
-            if (!player.equals(currentPlayer)) {
+            if (!player.equals(currentPlayer)) { // Kendisi hariç
                 playerNames.add(player.getName());
             }
         }
         return playerNames;
     }
 
-    private static List<String> filterEligiblePlayers(List<String> activePlayers) {
-        List<String> eligiblePlayers = new ArrayList<>();
-        for (String playerName : activePlayers) {
-            try {
-                // Oyuncu Vault sahibi veya üyesi değilse listeye ekle
-                if (!DatabaseManage.isVaultOwner(playerName) && !DatabaseManage.isVaultMember(playerName)) {
-                    eligiblePlayers.add(playerName);
-                }
-            } catch (SQLException e) {
-                System.err.println("Vault kontrolü sırasında hata: " + e.getMessage());
-            }
-        }
+    /**
+     * Kasa sahibi veya üyesi olmayan oyuncuları filtreler.
+     *
+     * @param activePlayers Çevrimiçi oyuncular listesi
+     * @return Filtrelenmiş oyuncular listesi
+     * @throws SQLException Veritabanı hatası oluşursa
+     */
+    private static List<String> getEligiblePlayers(List<String> activePlayers) throws SQLException {
+        // Aktif oyuncuları geçici listeye kopyala
+        List<String> eligiblePlayers = new ArrayList<>(activePlayers);
+
+        // Kasa sahiplerini ve üyelerini alın
+        List<String> vaultOwnersAndMembers = DatabaseManage.getAllVaultOwnersAndMembers();
+
+        // Kasa sahiplerini ve üyelerini uygun oyuncular listesinden çıkar
+        eligiblePlayers.removeAll(vaultOwnersAndMembers);
+
         return eligiblePlayers;
     }
-
 }

@@ -47,42 +47,48 @@ public class FormEcoMenu implements Listener {
 
                 // Tıklanan item
                 Item clickedItem = fakeInventory1.getItem(slot);
-
-                // Özel ad kontrolü
+                // "Kasa İşlemleri" tıklanmışsa
                 if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Kasa İşlemleri")) {
-                    fakeInventory1.close(player);
+                    fakeInventory1.close(player); // Mevcut envanteri kapat
 
                     try {
-                        if (DatabaseManage.isVaultOwner(player.getName())) {
+                        // Kasa sahibi mi?
+                        boolean isOwner = DatabaseManage.isVaultOwner(player.getName());
+                        // Kasa üyesi mi?
+                        boolean isMember = DatabaseManage.isVaultMember(player.getName());
+
+                        if (isOwner) {
+                            // Eğer kasa sahibi ise
                             player.getServer().getScheduler().scheduleDelayedTask(() -> {
-                                FakeInventory egerSahipse = FormVaultManage.vaultManageGUI(player);
-                                player.addWindow(egerSahipse);
+                                FakeInventory ownerMenu = FormVaultManage.vaultManageGUI(player); // Kasa yönetim formunu gönder
+                                player.addWindow(ownerMenu);
                             }, 5);
-
-                        } else if (DatabaseManage.isVaultMember(player.getName())) {
+                        } else if (isMember) {
+                            // Eğer kasa üyesi ise
                             player.getServer().getScheduler().scheduleDelayedTask(() -> {
-                                FakeInventory egerUyeyse = FormVaultMemberManage.vaultMemberManageGUI(player);
-                                player.addWindow(egerUyeyse);
-
-                            }, 6);
-
-                        } else {
-                            player.getServer().getScheduler().scheduleDelayedTask(() -> {
-                                FormVaultCreate formVaultCreate = new FormVaultCreate();
-                                formVaultCreate.open(player);
+                                FakeInventory memberMenu = FormVaultMemberManage.vaultMemberManageGUI(player); // Kasa üye yönetim formunu gönder
+                                player.addWindow(memberMenu);
                             }, 7);
+                        } else {
+                            // Eğer kasa sahibi veya üyesi değilse
+                            player.getServer().getScheduler().scheduleDelayedTask(() -> {
+                                FormVaultCreate formVaultCreate = new FormVaultCreate(); // Kasa oluşturma formunu gönder
+                                formVaultCreate.open(player);
+                            }, 9);
                         }
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        player.sendMessage(TextFormat.RED + "Kasa işlemleri kontrol edilirken bir hata oluştu.");
+                        e.printStackTrace(); // Konsola detaylı hata çıktısı
                     }
                 }
+
 
                 if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiyeni Gör")) {
                     fakeInventory1.close(player);
                     player.sendMessage(Prefix.getPrefix() + DatabaseManage.formatNumber(EconomyAPI.getInstance().getBalance(player.getName())));
                 }
 
-                if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiye Gönder")) {
+                else if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiye Gönder")) {
                     fakeInventory1.close(player);
 
                     player.getServer().getScheduler().scheduleDelayedTask(() -> {

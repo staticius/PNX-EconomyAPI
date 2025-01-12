@@ -8,37 +8,63 @@ import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.commands.CommandMenu;
 import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormEcoMenu;
+import dev.kailyn.forms.FormSendMoney;
 import dev.kailyn.forms.FormVaultManage;
+import dev.kailyn.forms.FormVaultMemberManage;
 import dev.kailyn.items.*;
 import dev.kailyn.listeners.*;
 import dev.kailyn.managers.EconomyManager;
 import dev.kailyn.managers.VaultManager;
 import dev.kailyn.tasks.DatabaseTaskManager;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main extends PluginBase {
 
     EconomyManager economyManager = new EconomyManager();
     VaultManager vaultManager = new VaultManager();
-
     @Override
     public void onEnable() {
         getLogger().info(TextFormat.GREEN + "+");
 
-
         try {
-            DatabaseManage.databaseConnect(getDataFolder().getAbsolutePath() + "/eco.db");
-        } catch (SQLException e) {
-            getLogger().error("Veritabanı bağlantısında bir sorun oluştu!", e.getCause());
+            // Plugin data klasörünü kontrol et ve oluştur
+            File dataFolder = getDataFolder();
+            if (!dataFolder.exists() && !dataFolder.mkdir()) {
+                getLogger().error(TextFormat.RED + "Plugin data klasörü oluşturulamadı!");
+                this.getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+
+            // Veritabanı dosyasını kontrol et
+            File databaseFile = new File(dataFolder, "economy.sqlite");
+            if (!databaseFile.exists() && !databaseFile.createNewFile()) {
+                getLogger().error(TextFormat.RED + "Veritabanı dosyası oluşturulamadı!");
+                this.getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+
+            // Veritabanı bağlantısı
+            String dbPath = databaseFile.getAbsolutePath();
+            getLogger().info("Veritabanı yolu: " + dbPath);
+            DatabaseManage.databaseConnect(dbPath);
+
+        } catch (IOException e) {
+            getLogger().error("Veritabanı bağlantısında bir sorun oluştu!", e);
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        // API başlatma
         EconomyAPI.init(economyManager, vaultManager);
 
+        // Komut ve olayları kaydetme
         registerCommands();
         registerEvents();
     }
+
 
     @Override
     public void onLoad() {
@@ -80,6 +106,8 @@ public class Main extends PluginBase {
         this.getServer().getPluginManager().registerEvents(new ListenerDeleteVault(), this);
         this.getServer().getPluginManager().registerEvents(new ListenerDepositVault(), this);
         this.getServer().getPluginManager().registerEvents(new ListenerWithdrawVault(), this);
+        this.getServer().getPluginManager().registerEvents(new ListenerPlayerJoin(), this);
+        this.getServer().getPluginManager().registerEvents(new FormSendMoney(), this);
+        this.getServer().getPluginManager().registerEvents(new FormVaultMemberManage(), this);
     }
-
 }

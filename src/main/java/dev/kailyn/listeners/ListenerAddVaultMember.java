@@ -16,11 +16,6 @@ public class ListenerAddVaultMember implements Listener {
     public void onFormRespond(PlayerFormRespondedEvent respondedEvent) {
         Player player = respondedEvent.getPlayer();
 
-        if (respondedEvent.wasClosed()) {
-            player.sendMessage(Prefix.getPrefix() + "İşlem iptal edildi. İyi oyunlar!");
-            return;
-        }
-
         // Form ID kontrolü (33 olarak belirttik)
         if (respondedEvent.getFormID() == 33) {
             if (respondedEvent.getWindow() instanceof FormWindowCustom formWindowCustom) {

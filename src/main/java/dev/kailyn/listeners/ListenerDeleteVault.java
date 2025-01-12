@@ -15,6 +15,8 @@ import dev.kailyn.forms.FormRemoveVaultMember;
 
 import java.sql.SQLException;
 
+import static dev.kailyn.database.DatabaseManage.*;
+
 public class ListenerDeleteVault implements Listener {
 
     @EventHandler
@@ -27,7 +29,12 @@ public class ListenerDeleteVault implements Listener {
                 int responseId = formResponse.getClickedButtonId();
 
                 if (responseId == 0) { // Evet
-                    boolean basarilimi = DatabaseManage.deleteVault(player.getName());
+                    boolean basarilimi;
+                    if (!deleteVault(player.getName())) {
+                        basarilimi = false;
+                    } else {
+                        basarilimi = true;
+                    }
 
                     if (basarilimi) {
                         player.sendMessage(Prefix.getPrefix() + "Kasanız silindi.");
@@ -36,11 +43,9 @@ public class ListenerDeleteVault implements Listener {
                     }
 
                 } else if (responseId == 1) { // Geri
-                    player.closeFormWindows();
-
                     player.getServer().getScheduler().scheduleDelayedTask(() -> {
                         FormEcoMenu.menuGUI(player);
-                    },6);
+                    },7);
                 }
             }
         }

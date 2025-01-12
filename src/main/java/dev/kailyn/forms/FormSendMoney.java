@@ -11,6 +11,7 @@ import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.api.EconomyAPI;
+import dev.kailyn.database.DatabaseManage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -81,7 +82,7 @@ public class FormSendMoney implements Listener {
                 parsedAmount *= 1000000;
             }
 
-            EconomyAPI.getInstance().transferMoney(player.getName(), selectedPlayer, parsedAmount);
+            EconomyAPI.getInstance().getEconomyManager().transfer(player.getName(), selectedPlayer, parsedAmount);
 
             player.sendMessage(Prefix.getPrefix() + selectedPlayer + " adlı oyuncuya " + amount + " " + unit + " " + Prefix.getMoneyUnit() + "gönderdin.");
 
