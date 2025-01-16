@@ -92,6 +92,20 @@ public class FormVaultMemberManage implements Listener {
                 Item clickedItem = fakeInventory.getItem(slot);
 
 
+                if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.AQUA + "Kasadaki Oyuncular")) {
+                    fakeInventory.close(player);
+
+                    player.getServer().getScheduler().scheduleDelayedTask(() -> {
+                        FormSeeVaultMembers formSeeVaultMembers = new FormSeeVaultMembers();
+                        try {
+                            formSeeVaultMembers.sendVaultFormDetails(player);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }, 5);
+                }
+
+
             });
         }
 

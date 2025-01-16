@@ -16,6 +16,10 @@ public class CommandMenu extends Command {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         Player player = (Player) sender;
 
+        if (!(sender instanceof Player)) {
+            return false;
+        }
+
         FakeInventory fakeInventory = FormEcoMenu.menuGUI(player);
         player.addWindow(fakeInventory);
 

@@ -47,7 +47,7 @@ public class Main extends PluginBase {
             }
 
             // Veritabanı bağlantısı
-            String dbPath = databaseFile.getAbsolutePath();
+            String dbPath = databaseFile.getCanonicalPath();
             getLogger().info("Veritabanı yolu: " + dbPath);
             DatabaseManage.databaseConnect(dbPath);
 

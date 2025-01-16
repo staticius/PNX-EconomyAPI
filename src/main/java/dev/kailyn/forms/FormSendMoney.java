@@ -12,6 +12,7 @@ import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.database.DatabaseManage;
+import dev.kailyn.managers.EconomyManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
