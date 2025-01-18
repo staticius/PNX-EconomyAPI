@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FormAddVaultMember {
 
-    private static final int ADD_MEMBER_MENU_ID = 1;
+    public static final int ADD_MEMBER_MENU_ID = 1;
 
     /**
      * Oyuncu için "Eklenecek Oyuncular" menüsünü açar.

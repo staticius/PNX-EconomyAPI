@@ -43,7 +43,7 @@ public class DatabaseManage {
         config.setJdbcUrl(dbPath);
 
         // HikariCP yapılandırmaları
-        config.setMaximumPoolSize(4);       // Maksimum 8 bağlantı
+        config.setMaximumPoolSize(8);       // Maksimum 8 bağlantı
         config.setMinimumIdle(4);          // Minimum 4 bağlantı
         config.setIdleTimeout(30000);      // Boşta kalma süresi: 30 saniye
         config.setMaxLifetime(1800000);    // Maksimum yaşam süresi: 30 dakika

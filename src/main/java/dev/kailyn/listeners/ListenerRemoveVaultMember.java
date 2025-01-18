@@ -1,12 +1,14 @@
 package dev.kailyn.listeners;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.response.FormResponseModal;
 import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
+import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormRemoveVaultMember;
@@ -45,10 +47,12 @@ public class ListenerRemoveVaultMember implements Listener {
                 if (responseId == 0) { // Evet
                     // Seçilen oyuncuyu al ve kaldır
                     String selectedMember = selectedMembers.get(player);
+                    Player oyuncu = Server.getInstance().getPlayer(selectedMember);
 
                     try {
                         if (DatabaseManage.removeMemberFromVault(player.getName(), selectedMember)) {
-                            player.sendMessage(Prefix.getPrefix() + selectedMember + " adlı oyuncu başarıyla kasadan çıkarıldı.");
+                            player.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + selectedMember + TextFormat.DARK_GREEN + " adlı oyuncu başarıyla kasadan çıkarıldı.");
+                            oyuncu.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + player.getName() + TextFormat.DARK_GREEN + " adlı oyuncu sizi kasasından çıkardı.");
                         } else {
                             player.sendMessage("Kasadan oyuncuyu çıkarırken bir hata oluştu.");
                         }

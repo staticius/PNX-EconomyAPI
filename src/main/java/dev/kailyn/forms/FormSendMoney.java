@@ -11,9 +11,8 @@ import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.api.EconomyAPI;
-import dev.kailyn.database.DatabaseManage;
-import dev.kailyn.managers.EconomyManager;
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +57,18 @@ public class FormSendMoney implements Listener {
 
             FormWindowCustom window = (FormWindowCustom) event.getWindow();
 
+            if (window.getResponse() == null) {
+                return;
+            }
+
             String selectedPlayer = window.getResponse().getDropdownResponse(0).getElementContent();
             String amount = window.getResponse().getInputResponse(1);
             String unit = window.getResponse().getDropdownResponse(2).getElementContent();
+
+            if (selectedPlayer.equals("Hiçbir oyuncu mevcut değil.")) {
+                return;
+            }
+
 
             // Miktar doğrulama
             double parsedAmount;
@@ -77,20 +85,30 @@ public class FormSendMoney implements Listener {
             }
 
             // Birim işleme
-            if (unit.equals("K")) {
+            if (unit.equals("K (Bin)")) {
                 parsedAmount *= 1000;
-            } else if (unit.equals("M")) {
+            } else if (unit.equals("M (Milyon)")) {
                 parsedAmount *= 1000000;
             }
 
-            EconomyAPI.getInstance().getEconomyManager().transfer(player.getName(), selectedPlayer, parsedAmount);
+            double bakiye = EconomyAPI.getInstance().getEconomyManager().getBalance(player.getName());
 
-            player.sendMessage(Prefix.getPrefix() + selectedPlayer + " adlı oyuncuya " + amount + " " + unit + " " + Prefix.getMoneyUnit() + "gönderdin.");
+            if (bakiye >= parsedAmount) {
 
-            // Alıcı oyuncuya mesaj gönderme
-            Player receiver = Server.getInstance().getPlayer(selectedPlayer);
-            if (receiver != null && receiver.isOnline()) {
-                receiver.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + player.getName() + " size " + amount + " " + unit + " " + Prefix.getMoneyUnit() + " gönderdi.");
+                EconomyAPI.getInstance().getEconomyManager().transfer(player.getName(), selectedPlayer, parsedAmount);
+
+                player.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + selectedPlayer + TextFormat.DARK_GREEN + " adlı oyuncuya " + TextFormat.GREEN + amount + " " + unit + " " + Prefix.getMoneyUnit() + TextFormat.DARK_GREEN + " gönderdin.");
+
+                // Alıcı oyuncuya mesaj gönderme
+                Player receiver = Server.getInstance().getPlayer(selectedPlayer);
+
+                if (receiver != null && receiver.isOnline()) {
+                    receiver.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + player.getName() + TextFormat.DARK_GREEN + " adlı oyuncu size " + TextFormat.GREEN + amount + " " + unit + " " + Prefix.getMoneyUnit() + TextFormat.DARK_GREEN + " gönderdi.");
+                }
+
+
+            } else {
+                player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_RED + "Yeterli bakiyeniz bulunmamaktadır, güncel bakiyeniz: " + TextFormat.RED + bakiye + " " + Prefix.getMoneyUnit());
             }
 
         }

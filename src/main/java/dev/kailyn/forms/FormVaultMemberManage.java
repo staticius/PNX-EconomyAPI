@@ -3,6 +3,7 @@ package dev.kailyn.forms;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.Listener;
+import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.inventory.fake.FakeInventory;
 import cn.nukkit.inventory.fake.FakeInventoryType;
 import cn.nukkit.item.Item;
@@ -11,6 +12,7 @@ import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.database.DatabaseManage;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import static dev.kailyn.database.DatabaseManage.getVaultOwner;
@@ -97,12 +99,48 @@ public class FormVaultMemberManage implements Listener {
 
                     player.getServer().getScheduler().scheduleDelayedTask(() -> {
                         FormSeeVaultMembers formSeeVaultMembers = new FormSeeVaultMembers();
+
                         try {
-                            formSeeVaultMembers.sendVaultFormDetails(player);
+                            formSeeVaultMembers.sendVaultFormDetailsForMember(player);
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
+
                     }, 5);
+                }
+
+                if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.AQUA + "Kasadan Ayrıl")){
+
+                    fakeInventory.close(player);
+
+                    player.getServer().getScheduler().scheduleDelayedTask(() -> {
+
+                        FormQuitVault.openQuitVaultForm(player);
+
+                    }, 5);
+                }
+
+                if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.AQUA + "Para Çek")) {
+
+                    fakeInventory.close(player);
+
+                    player.getServer().getScheduler().scheduleDelayedTask(() -> {
+
+                        FormWithdrawVault.withdrawVaultForMember(player);
+
+                    }, 5);
+                }
+
+                if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.AQUA + "Para Yatır")) {
+
+                    fakeInventory.close(player);
+
+                    player.getServer().getScheduler().scheduleDelayedTask(() -> {
+
+                        FormDepositVault.formDepositVault(player);
+
+                    }, 5);
+
                 }
 
 

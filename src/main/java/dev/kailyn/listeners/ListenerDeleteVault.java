@@ -26,6 +26,7 @@ public class ListenerDeleteVault implements Listener {
 
         if (formRespondedEvent.getFormID() == FormDeleteVault.DELETE_VAULT_FORM_ID) {
             if (response instanceof FormResponseModal formResponse) {
+
                 int responseId = formResponse.getClickedButtonId();
 
                 if (responseId == 0) { // Evet

@@ -6,6 +6,7 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.response.FormResponseCustom;
+import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormDepositVault;
@@ -31,7 +32,7 @@ public class ListenerDepositVault implements Listener {
                         double yatirilacak = Double.parseDouble(amountInput.trim());
 
                         if (yatirilacak <= 0) {
-                            player.sendMessage(Prefix.getPrefix() + "Yatırılacak para sıfırdan büyük olmalı.");
+                            player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Yatırılacak para sıfırdan büyük olmalıdır.");
                             return;
                         }
 
@@ -39,7 +40,7 @@ public class ListenerDepositVault implements Listener {
                         double mevcutPara = DatabaseManage.getBalance(player.getName()); // Oyuncunun mevcut bakiyesi
 
                         if (yatirilacak > mevcutPara) {
-                            player.sendMessage(Prefix.getPrefix() + "Yeterli bakiyeniz bulunmamaktadır. Mevcut bakiye: " + DatabaseManage.formatNumber(mevcutPara));
+                            player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Yeterli bakiyeniz bulunmamaktadır, mevcut bakiyeniz: " + TextFormat.GREEN + DatabaseManage.formatNumber(mevcutPara));
                             return;
                         }
 
@@ -55,7 +56,7 @@ public class ListenerDepositVault implements Listener {
                             // Oyuncunun bakiyesini güncelle
                             DatabaseManage.updateBalance(player.getName(), mevcutPara - yatirilacak);
 
-                            player.sendMessage(Prefix.getPrefix() + "Başarıyla " + DatabaseManage.formatNumber(yatirilacak) + " Wolf Coin yatırıldı. Güncel kasa bakiyesi: " + DatabaseManage.formatNumber(guncelBakiye));
+                            player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Başarıyla " + TextFormat.GREEN + DatabaseManage.formatNumber(yatirilacak) + TextFormat.DARK_GREEN + " Wolf Coin yatırıldı, güncel kasa bakiyesi: " + TextFormat.GREEN + DatabaseManage.formatNumber(guncelBakiye) + TextFormat.DARK_GREEN + " Wolf Coin");
                         } else if (kasaUyesiMi) {
                             // Oyuncu bir kasanın üyesi ise
                             Optional<String> optionalKasaSahibiKim = DatabaseManage.getVaultOwner(player.getName());
@@ -69,7 +70,7 @@ public class ListenerDepositVault implements Listener {
                                 // Oyuncunun bakiyesini güncelle
                                 DatabaseManage.updateBalance(player.getName(), mevcutPara - yatirilacak);
 
-                                player.sendMessage(Prefix.getPrefix() + "Başarıyla " + DatabaseManage.formatNumber(yatirilacak) + " Wolf Coin yatırıldı. Güncel kasa bakiyesi: " + DatabaseManage.formatNumber(guncelBakiye) + "Wolf Coin");
+                                player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Başarıyla " + TextFormat.GREEN + DatabaseManage.formatNumber(yatirilacak) + TextFormat.DARK_GREEN + " Wolf Coin yatırıldı, güncel kasa bakiyesi: " + TextFormat.GREEN + DatabaseManage.formatNumber(guncelBakiye) + TextFormat.DARK_GREEN + " Wolf Coin");
                             } else {
                                 player.sendMessage(Prefix.getPrefix() + "Kasa sahibi bulunamadı.");
                             }
@@ -79,13 +80,13 @@ public class ListenerDepositVault implements Listener {
                         }
 
                     } catch (NumberFormatException e) {
-                        player.sendMessage(Prefix.getPrefix() + "Geçersiz bir değer girdiniz. Lütfen sadece sayısal bir değer giriniz.");
+                        player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_RED + "Geçersiz bir değer girdiniz, lütfen sadece sayısal bir değer giriniz.");
                     } catch (SQLException e) {
-                        player.sendMessage(Prefix.getPrefix() + "Bir veritabanı hatası oluştu. Lütfen daha sonra tekrar deneyin.");
+                        player.sendMessage(Prefix.getPrefix() + "Bir veritabanı hatası oluştu lütfen daha sonra tekrar deneyin.");
                         Server.getInstance().getLogger().error(e.getMessage());
                     }
                 } else {
-                    player.sendMessage(Prefix.getPrefix() + "Bir miktar girmediniz.");
+                    player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_RED + "Bir miktar girmediniz.");
                 }
             }
 

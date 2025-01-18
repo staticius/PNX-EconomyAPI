@@ -24,7 +24,7 @@ public class FormEcoAdmin {
             }
         }
         if (playerNames.isEmpty()) {
-            playerNames.add("Hiçbir oyuncu mevcut değil");
+            playerNames.add("Hiçbir oyuncu mevcut değil.");
         }
         return playerNames;
     }
@@ -38,15 +38,18 @@ public class FormEcoAdmin {
 
         formWindowCustom.addElement(new ElementInput("Miktar", "Eklenecek/Çıkarılacak Miktar"));
 
+        player.showFormWindow(formWindowCustom);
+
     }
 
     private List<String> getOption() {
         List<String> options = new ArrayList<>();
         options.add("Bakiye Ekle");
         options.add("Bakiye Çıkar");
+        options.add("Bakiyeyi Görüntüle");
         options.add("Kasa Bakiyesi Ekle");
         options.add("Kasa Bakiyesi Çıkar");
-
+        options.add("Kasa Bakiyesini Görüntüle");
         return options;
     }
 

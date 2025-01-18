@@ -12,6 +12,7 @@ import dev.kailyn.database.DatabaseManage;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import static dev.kailyn.forms.FormEcoAdmin.getStrings;
 
@@ -47,48 +48,65 @@ public class FormEcoMenu implements Listener {
 
                 // Tıklanan item
                 Item clickedItem = fakeInventory1.getItem(slot);
-                // "Kasa İşlemleri" tıklanmışsa
+
                 if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Kasa İşlemleri")) {
-                    fakeInventory1.close(player); // Mevcut envanteri kapat
+
+                    fakeInventory1.close(player);
 
                     try {
-                        // Kasa sahibi mi?
-                        boolean isOwner = DatabaseManage.isVaultOwner(player.getName());
-                        // Kasa üyesi mi?
-                        boolean isMember = DatabaseManage.isVaultMember(player.getName());
 
-                        if (isOwner) {
-                            // Eğer kasa sahibi ise
+                        boolean kasasiVarMi = DatabaseManage.isPlayerInAnyVault(player.getName());
+
+
+                        if (DatabaseManage.isVaultOwner(player.getName())) {
+
+                            player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Sahibi olduğunuz kasaya yönlendiriliyorsunuz.");
+
                             player.getServer().getScheduler().scheduleDelayedTask(() -> {
-                                FakeInventory ownerMenu = FormVaultManage.vaultManageGUI(player); // Kasa yönetim formunu gönder
-                                player.addWindow(ownerMenu);
-                            }, 5);
-                        } else if (isMember) {
-                            // Eğer kasa üyesi ise
-                            player.getServer().getScheduler().scheduleDelayedTask(() -> {
-                                FakeInventory memberMenu = FormVaultMemberManage.vaultMemberManageGUI(player); // Kasa üye yönetim formunu gönder
-                                player.addWindow(memberMenu);
-                            }, 7);
-                        } else {
-                            // Eğer kasa sahibi veya üyesi değilse
-                            player.getServer().getScheduler().scheduleDelayedTask(() -> {
-                                FormVaultCreate formVaultCreate = new FormVaultCreate(); // Kasa oluşturma formunu gönder
-                                formVaultCreate.open(player);
-                            }, 9);
+
+                                player.addWindow(FormVaultManage.vaultManageGUI(player));
+
+                            }, 15);
                         }
+
+
+                        if (DatabaseManage.isVaultMember(player.getName())) {
+
+                            Optional<String> optionalOwnr = DatabaseManage.getVaultOwner(player.getName());
+
+                            if (optionalOwnr.isPresent()) {
+                                String owner = optionalOwnr.get();
+                                player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Üyesi olduğunuz kasaya yönlendiriliyorsunuz, kasanın sahibi: " + TextFormat.GREEN + owner);
+
+                            } else {
+                                player.sendMessage(Prefix.getPrefix() + TextFormat.RED + "Kasa sahibi bulunamadı!");
+                            }
+
+                            player.getServer().getScheduler().scheduleDelayedTask(() -> {
+
+                                player.addWindow(FormVaultMemberManage.vaultMemberManageGUI(player));
+
+                            }, 15);
+
+
+                        } else if (!DatabaseManage.isPlayerInAnyVault(player.getName()) && !DatabaseManage.isVaultOwner(player.getName())) {
+
+                            fakeInventory1.close(player);
+
+                            player.getServer().getScheduler().scheduleDelayedTask(() -> {
+                                FormVaultCreate.open(player);
+                            }, 15);
+                        }
+
+
                     } catch (SQLException e) {
-                        player.sendMessage(TextFormat.RED + "Kasa işlemleri kontrol edilirken bir hata oluştu.");
-                        e.printStackTrace(); // Konsola detaylı hata çıktısı
+                        throw new RuntimeException(e);
                     }
-                }
 
-
-                if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiyeni Gör")) {
+                } else if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiyeni Gör")) {
                     fakeInventory1.close(player);
-                    player.sendMessage(Prefix.getPrefix() + DatabaseManage.formatNumber(EconomyAPI.getInstance().getBalance(player.getName())));
-                }
-
-                else if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiye Gönder")) {
+                    player.sendMessage(Prefix.getPrefix() + TextFormat.DARK_GREEN + "Mevcut bakiyeniz: " + TextFormat.GREEN + DatabaseManage.formatNumber(EconomyAPI.getInstance().getBalance(player.getName())) + TextFormat.DARK_GREEN + " Wolf Coin.");
+                } else if (clickedItem.hasCustomName() && clickedItem.getCustomName().equals(TextFormat.YELLOW + "Bakiye Gönder")) {
                     fakeInventory1.close(player);
 
                     player.getServer().getScheduler().scheduleDelayedTask(() -> {

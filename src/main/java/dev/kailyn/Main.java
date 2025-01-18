@@ -5,6 +5,7 @@ import cn.nukkit.registry.RegisterException;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.api.EconomyAPI;
+import dev.kailyn.commands.CommandEcoAdmin;
 import dev.kailyn.commands.CommandMenu;
 import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormEcoMenu;
@@ -94,10 +95,14 @@ public class Main extends PluginBase {
     }
 
     private void registerCommands() {
+
         this.getServer().getCommandMap().register("ecomenu", new CommandMenu("ecomenu", "Ekonomi Menüsü"));
+        this.getServer().getCommandMap().register("ecoadmin", new CommandEcoAdmin("ecoadmin", "Ekonomi admin paneli"));
+
     }
 
     private void registerEvents() {
+
         this.getServer().getPluginManager().registerEvents(new FormEcoMenu(), this);
         this.getServer().getPluginManager().registerEvents(new ListenerVaultCreate(), this);
         this.getServer().getPluginManager().registerEvents(new FormVaultManage(), this);
@@ -109,5 +114,8 @@ public class Main extends PluginBase {
         this.getServer().getPluginManager().registerEvents(new ListenerPlayerJoin(), this);
         this.getServer().getPluginManager().registerEvents(new FormSendMoney(), this);
         this.getServer().getPluginManager().registerEvents(new FormVaultMemberManage(), this);
+        this.getServer().getPluginManager().registerEvents(new ListenerQuitVault(), this);
+        this.getServer().getPluginManager().registerEvents(new ListenerFormEcoAdmin(), this);
+
     }
 }
