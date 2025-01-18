@@ -1,9 +1,12 @@
 package dev.kailyn.api;
 
+import dev.kailyn.Prefix;
+import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.managers.EconomyManager;
 import dev.kailyn.managers.VaultManager;
 import dev.kailyn.tasks.DatabaseTaskManager;
 
+import java.sql.SQLException;
 import java.util.function.Consumer;
 
 public class EconomyAPI {
@@ -85,6 +88,10 @@ public class EconomyAPI {
         });
     }
 
+    public void setBalance(String playerName, double amount) throws SQLException {
+        DatabaseManage.updateBalance(playerName, amount);
+    }
+
 
     public EconomyManager getEconomyManager() {
         return economyManager;
@@ -92,6 +99,14 @@ public class EconomyAPI {
 
     public VaultManager getVaultManager() {
         return vaultManager;
+    }
+
+    public String getMoneyUnit(){
+        return Prefix.getMoneyUnit();
+    }
+
+    public String getPrefix(){
+        return Prefix.getPrefix();
     }
 
 }
