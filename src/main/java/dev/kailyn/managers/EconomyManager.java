@@ -5,6 +5,7 @@ import dev.kailyn.database.DatabaseManage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class EconomyManager {
 
@@ -40,12 +41,12 @@ public class EconomyManager {
         }
     }
 
-    public boolean deposit(String playerName, double amount) {
+    public boolean addBalance(String playerName, double amount) {
         double balance = getBalance(playerName);
         return updateBalance(playerName, balance + amount);
     }
 
-    public boolean withdraw(String playerName, double amount) {
+    public boolean removeBalance(String playerName, double amount) {
         double currentBalance = getBalance(playerName);
         if (currentBalance < amount) {
             return false;
@@ -54,10 +55,14 @@ public class EconomyManager {
     }
 
     public boolean transfer(String fromPlayerName, String toPlayerName, double amount) {
-        if (withdraw(fromPlayerName, amount)) {
-            return deposit(toPlayerName, amount);
+        if (removeBalance(fromPlayerName, amount)) {
+            return addBalance(toPlayerName, amount);
         }
         return false;
+    }
+
+    public List<String> getTopBalanceList(int limit) throws SQLException {
+        return DatabaseManage.getTopBalanceList(limit);
     }
 
 

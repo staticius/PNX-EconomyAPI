@@ -11,6 +11,8 @@ import java.util.List;
 
 public class FormEcoAdmin {
 
+    public static final int ECO_ADMIN_ID = 31;
+
     private static List<String> getOnlinePlayerNames(Player currentPlayer) {
         return getStrings(currentPlayer);
     }
@@ -29,19 +31,6 @@ public class FormEcoAdmin {
         return playerNames;
     }
 
-    public void sendFormEcoAdmin(Player player) {
-        FormWindowCustom formWindowCustom = new FormWindowCustom("Economy Admin Menüsü");
-
-        formWindowCustom.addElement(new ElementDropdown("Oyuncu", getOnlinePlayerNames(player)));
-
-        formWindowCustom.addElement(new ElementDropdown("İşlem", getOption()));
-
-        formWindowCustom.addElement(new ElementInput("Miktar", "Eklenecek/Çıkarılacak Miktar"));
-
-        player.showFormWindow(formWindowCustom);
-
-    }
-
     private List<String> getOption() {
         List<String> options = new ArrayList<>();
         options.add("Bakiye Ekle");
@@ -51,6 +40,19 @@ public class FormEcoAdmin {
         options.add("Kasa Bakiyesi Çıkar");
         options.add("Kasa Bakiyesini Görüntüle");
         return options;
+    }
+
+    public void sendFormEcoAdmin(Player player) {
+        FormWindowCustom formWindowCustom = new FormWindowCustom("Economy Admin Menüsü");
+
+        formWindowCustom.addElement(new ElementDropdown("Oyuncu", getOnlinePlayerNames(player)));
+
+        formWindowCustom.addElement(new ElementDropdown("İşlem", getOption()));
+
+        formWindowCustom.addElement(new ElementInput("Miktar", "Eklenecek/Çıkarılacak Miktar"));
+
+        player.showFormWindow(formWindowCustom, ECO_ADMIN_ID);
+
     }
 
 

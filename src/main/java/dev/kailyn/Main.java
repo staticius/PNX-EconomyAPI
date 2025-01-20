@@ -7,6 +7,7 @@ import cn.nukkit.utils.TextFormat;
 import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.commands.CommandEcoAdmin;
 import dev.kailyn.commands.CommandMenu;
+import dev.kailyn.commands.CommandTopBalance;
 import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormEcoMenu;
 import dev.kailyn.forms.FormSendMoney;
@@ -26,6 +27,7 @@ public class Main extends PluginBase {
 
     EconomyManager economyManager = new EconomyManager();
     VaultManager vaultManager = new VaultManager();
+
     @Override
     public void onEnable() {
         getLogger().info(TextFormat.GREEN + "+");
@@ -76,6 +78,10 @@ public class Main extends PluginBase {
             Registries.ITEM.registerCustomItem(this, ItemAddMember.class);
             Registries.ITEM.registerCustomItem(this, ItemRemoveMember.class);
             Registries.ITEM.registerCustomItem(this, ItemPlayerMoney.class);
+            Registries.ITEM.registerCustomItem(this, ItemWithdrawMoney.class);
+            Registries.ITEM.registerCustomItem(this, ItemDepositMoney.class);
+            Registries.ITEM.registerCustomItem(this, ItemSeeMoney.class);
+            Registries.ITEM.registerCustomItem(this, ItemSendMoney.class);
 
         } catch (RegisterException e) {
             throw new RuntimeException(e);
@@ -98,11 +104,13 @@ public class Main extends PluginBase {
 
         this.getServer().getCommandMap().register("ecomenu", new CommandMenu("ecomenu", "Ekonomi Menüsü"));
         this.getServer().getCommandMap().register("ecoadmin", new CommandEcoAdmin("ecoadmin", "Ekonomi admin paneli"));
+        this.getServer().getCommandMap().register("topbalance", new CommandTopBalance("topbalance", "En zengin 10 oyuncuyu görüntüle.", "/topbalance"));
 
     }
 
     private void registerEvents() {
 
+        this.getServer().getPluginManager().registerEvents(new ListenerFormEcoAdmin(), this);
         this.getServer().getPluginManager().registerEvents(new FormEcoMenu(), this);
         this.getServer().getPluginManager().registerEvents(new ListenerVaultCreate(), this);
         this.getServer().getPluginManager().registerEvents(new FormVaultManage(), this);
@@ -115,7 +123,6 @@ public class Main extends PluginBase {
         this.getServer().getPluginManager().registerEvents(new FormSendMoney(), this);
         this.getServer().getPluginManager().registerEvents(new FormVaultMemberManage(), this);
         this.getServer().getPluginManager().registerEvents(new ListenerQuitVault(), this);
-        this.getServer().getPluginManager().registerEvents(new ListenerFormEcoAdmin(), this);
 
     }
 }

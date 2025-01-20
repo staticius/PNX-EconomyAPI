@@ -21,9 +21,9 @@ public class FormVaultManage implements Listener {
         Item space = Item.get("wolfland:space");
         Item addMember = Item.get("wolfland:add_member");
         Item removeMember = Item.get("wolfland:remove_member");
-        Item paraCek = Item.get(Item.PAPER);
-        Item paraYatir = Item.get(Item.WRITABLE_BOOK);
-        Item balance = Item.get("wolfland:banka_img");
+        Item paraCek = Item.get("wolfland:para_cek");
+        Item paraYatir = Item.get("wolfland:para_yatir");
+        Item balance = Item.get("wolfland:para_bak");
         Item seeMembers = Item.get("wolfland:soruisareti");
         Item deleteVault = Item.get(Block.REDSTONE_BLOCK);
 

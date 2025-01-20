@@ -124,6 +124,18 @@ public class VaultManager {
 
     /***
      *
+     * @param owner Kasa sahibi
+     * @return Parametre olarak gönderdiğimiz kasa sahibinin kasasında kaç oyuncu varsa return eder hiç oyuncu yoksa 0 döner
+     * @throws SQLException Veritabanı hatasına karşı
+     */
+
+    public int getVaultMembersCount(String owner) throws SQLException {
+        return DatabaseManage.getVaultMemberCount(owner);
+    }
+
+
+    /***
+     *
      * @param message Hata mesajı
      * @param e .
      */

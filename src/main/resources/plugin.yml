@@ -1,5 +1,8 @@
 name: WL-Economy
-author: KailyDEV -> @Staticius
+description: WolfLand SkyBlock EconomyAPI
+author: KailynDEV -> @Staticius
+website: https://kailynteam.dev
+prefix: WL-Economy
 version: "0.01"
 main: dev.kailyn.Main
 api: [ 2.0.0 ]

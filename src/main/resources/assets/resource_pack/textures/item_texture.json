@@ -17,6 +17,18 @@
     },
     "oyuncu_parasi": {
       "textures": "textures/items/oyuncuparasi.png"
+    },
+    "parabak": {
+      "textures": "textures/items/parabak.png"
+    },
+    "paracek": {
+      "textures": "textures/items/paracek.png"
+    },
+    "parayatir": {
+      "textures": "textures/items/parayatir.png"
+    },
+    "paragonder": {
+      "textures": "textures/items/paragonder.png"
     }
   }
 }

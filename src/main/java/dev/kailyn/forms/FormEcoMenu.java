@@ -1,6 +1,7 @@
 package dev.kailyn.forms;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.event.Listener;
 import cn.nukkit.inventory.fake.FakeInventory;
 import cn.nukkit.inventory.fake.FakeInventoryType;
@@ -22,8 +23,8 @@ public class FormEcoMenu implements Listener {
 
         FakeInventory fakeInventory = new FakeInventory(FakeInventoryType.HOPPER, "Ekonomi Menüsü");
 
-        Item sendMoney = Item.get(Item.ARROW);
-        Item createVault = Item.get("wolfland:banka_img");
+        Item sendMoney = Item.get("wolfland:para_gonder");
+        Item createVault = Item.get(Block.BARREL);
         Item seeMoney = Item.get("wolfland:player_money");
         Item space = Item.get("wolfland:space");
 

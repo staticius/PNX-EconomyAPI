@@ -15,7 +15,6 @@ import dev.kailyn.forms.FormAddVaultMember;
 import java.sql.SQLException;
 
 public class ListenerAddVaultMember implements Listener {
-
     @EventHandler
     public void onFormRespond(PlayerFormRespondedEvent respondedEvent) {
         Player player = respondedEvent.getPlayer();
@@ -43,11 +42,18 @@ public class ListenerAddVaultMember implements Listener {
                 }
 
                 try {
+                    // Kasa üye sayısını kontrol et
+                    int memberCount = DatabaseManage.getVaultMemberCount(player.getName());
+
+                    if (memberCount >= 5) {
+                        player.sendMessage(Prefix.getPrefix() + TextFormat.RED + "Kasanızda maksimum 5 üye bulunabilir.");
+                        return;
+                    }
+
                     // Seçilen oyuncuyu Vault'a ekle
                     boolean success = DatabaseManage.addMemberToVault(player.getName(), selectedPlayerName);
 
                     if (success) {
-                        // Oyuncu adlarını almak için `getName()` metodu kullanılıyor
                         player.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + selectedPlayer.getName() + TextFormat.DARK_GREEN + " başarıyla kasaya eklendi.");
                         selectedPlayer.sendMessage(Prefix.getPrefix() + TextFormat.GREEN + player.getName() + TextFormat.DARK_GREEN + " sizi kasasına ekledi.");
                     } else {
@@ -60,4 +66,5 @@ public class ListenerAddVaultMember implements Listener {
             }
         }
     }
+
 }

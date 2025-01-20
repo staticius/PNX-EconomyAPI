@@ -1,7 +1,12 @@
 package dev.kailyn.api;
 
+import cn.nukkit.network.protocol.CraftingDataPacket;
+import cn.nukkit.network.protocol.UnlockedRecipesPacket;
+import cn.nukkit.recipe.CraftingRecipe;
+import cn.nukkit.recipe.ShapedRecipe;
 import dev.kailyn.Prefix;
 import dev.kailyn.database.DatabaseManage;
+import dev.kailyn.items.ItemAddMember;
 import dev.kailyn.managers.EconomyManager;
 import dev.kailyn.managers.VaultManager;
 import dev.kailyn.tasks.DatabaseTaskManager;
@@ -89,7 +94,7 @@ public class EconomyAPI {
     }
 
     public void setBalance(String playerName, double amount) throws SQLException {
-        DatabaseManage.updateBalance(playerName, amount);
+         DatabaseManage.updateBalance(playerName, amount);
     }
 
 

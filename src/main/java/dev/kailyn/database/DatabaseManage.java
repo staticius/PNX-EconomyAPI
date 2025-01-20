@@ -536,6 +536,30 @@ public class DatabaseManage {
         }
     }
 
+    /*** Parametre olarak girilen oyuncu isminin sahip olduğu kasada kaç tane oyuncu olduğunu döndürür
+     *
+     * @param ownerName Kasa sahibi
+     * @return Parametre olarak girilen oyuncu isminin sahip olduğu kasada kaç tane oyuncu olduğunu döndürür
+     * @throws SQLException Veritabanı hatasına karşı
+     */
+
+    public static int getVaultMemberCount(String ownerName) throws SQLException {
+        String sql = "SELECT members FROM Vaults WHERE ownerName = ?";
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, ownerName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String membersJson = resultSet.getString("members");
+                JSONArray membersArray = new JSONArray(membersJson);
+                return membersArray.length();
+            }
+        }
+        return 0; // Üyeler yoksa 0 döner
+    }
+
+
+
     /*** Sayıları düzgün bir şekilde formatlar (YALNIZCA OYUNCUYA PARA DEĞERİ GÖSTERİRKEN KULLANILMALIDIR).
      *
      * @param value Sayı
@@ -574,6 +598,33 @@ public class DatabaseManage {
         }
 
         return vaultOwnersAndMembers;
+    }
+
+    /***
+     *
+     * @param limit Kaç oyuncu alınacağını belirler
+     * @return belirlenen limite göre en çok parası olan oyuncuları sıralar
+     * @throws SQLException Veritabanı hatalarına karşı
+     */
+
+    public static List<String> getTopBalanceList(int limit) throws SQLException {
+        String sql = "SELECT playerName, balance FROM Player ORDER BY balance DESC LIMIT ?";
+        List<String> topPlayers = new ArrayList<>();
+
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, limit); // Kaç oyuncu alınacağı belirleniyor (örneğin: 10)
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String playerName = resultSet.getString("playerName");
+                double balance = resultSet.getDouble("balance");
+                // Oyuncu adını ve bakiyesini formatlı şekilde listeye ekle
+                topPlayers.add(playerName + " - " + formatNumber(balance));
+            }
+        }
+
+        return topPlayers;
     }
 
 
