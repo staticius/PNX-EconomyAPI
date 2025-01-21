@@ -8,8 +8,6 @@ public class DatabaseTaskManager {
 
     public static void submitTask(Runnable task) {
         executor.submit(task);
-
-
     }
 
     public static void shutdown() {

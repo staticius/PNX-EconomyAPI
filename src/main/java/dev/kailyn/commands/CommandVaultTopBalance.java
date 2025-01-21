@@ -7,6 +7,8 @@ import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
 import dev.kailyn.forms.FormVaultTopBalance;
 
+import java.sql.SQLException;
+
 public class CommandVaultTopBalance extends Command {
     public CommandVaultTopBalance(String name, String description) {
         super(name, description);
@@ -17,6 +19,13 @@ public class CommandVaultTopBalance extends Command {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
+            FormVaultTopBalance formVaultTopBalance = new FormVaultTopBalance();
+
+            try {
+                player.addWindow(formVaultTopBalance.openFormTopVaultBalance(player));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
             return true;
         }

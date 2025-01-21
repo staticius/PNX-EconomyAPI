@@ -5,6 +5,9 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.utils.TextFormat;
 import dev.kailyn.Prefix;
+import dev.kailyn.forms.FormTopBalance;
+
+import java.sql.SQLException;
 
 public class CommandTopBalance extends Command {
     public CommandTopBalance(String name, String description, String usageMessage) {
@@ -18,7 +21,12 @@ public class CommandTopBalance extends Command {
 
             Player player = (Player) sender;
 
-
+            FormTopBalance formTopBalance = new FormTopBalance();
+            try {
+                player.addWindow(formTopBalance.openFormTopBalance(player));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
 
         } else {

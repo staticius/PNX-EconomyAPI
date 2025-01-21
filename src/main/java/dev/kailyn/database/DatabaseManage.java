@@ -627,5 +627,43 @@ public class DatabaseManage {
         return topPlayers;
     }
 
+    /*** En çok bakiye bulunan kasaları verir
+     *
+     * @param limit maximum kaç kasa dönecek
+     * @return En çok bakiyesi bulunan kasaları sahipleriyle birlikte döner
+     * @throws SQLException veritabanı hatasına karşı
+     */
+
+    public static List<String> getTopVaultBalanceList(int limit) throws SQLException {
+        String sql = "SELECT ownerName, totalBalance FROM Vaults ORDER BY totalBalance DESC LIMIT ?";
+        List<String> topVaults = new ArrayList<>();
+
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, limit); // Kaç vault alınacağı belirleniyor (örneğin: 10)
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String ownerName = resultSet.getString("ownerName");
+                double totalBalance = resultSet.getDouble("totalBalance");
+                // Vault sahibinin adını ve bakiyesini formatlı şekilde listeye ekle
+                topVaults.add(ownerName + " - " + formatNumber(totalBalance));
+            }
+        }
+
+        return topVaults;
+    }
+
+
+    public static List<String> parseMembers(String membersJson) {
+        JSONArray membersArray = new JSONArray(membersJson);
+        List<String> members = new ArrayList<>();
+        for (int i = 0; i < membersArray.length(); i++) {
+            members.add(membersArray.getString(i));
+        }
+        return members;
+    }
+
+
 
 }

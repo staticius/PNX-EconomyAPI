@@ -24,7 +24,7 @@ public class FormEcoMenu implements Listener {
         FakeInventory fakeInventory = new FakeInventory(FakeInventoryType.HOPPER, "Ekonomi Menüsü");
 
         Item sendMoney = Item.get("wolfland:para_gonder");
-        Item createVault = Item.get(Block.BARREL);
+        Item createVault = Item.get("wolfland:banka_img");
         Item seeMoney = Item.get("wolfland:player_money");
         Item space = Item.get("wolfland:space");
 

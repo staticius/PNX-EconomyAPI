@@ -29,6 +29,24 @@
     },
     "paragonder": {
       "textures": "textures/items/paragonder.png"
+    },
+    "tac": {
+      "textures": "textures/items/tac.png"
+    },
+    "baltop_birinci": {
+      "textures": "textures/items/baltop_birinci.png"
+    },
+    "baltop_ikinci": {
+      "textures": "textures/items/baltop_ikinci.png"
+    },
+    "baltop_ucuncu": {
+      "textures": "textures/items/baltop_ucuncu.png"
+    },
+    "baltop_other": {
+      "textures": "textures/items/baltop_other.png"
+    },
+    "vault_top_bakiye": {
+      "textures": "textures/items/siralama_kasa_bakiye.png"
     }
   }
 }

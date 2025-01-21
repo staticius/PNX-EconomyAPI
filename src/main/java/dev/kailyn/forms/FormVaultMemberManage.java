@@ -29,7 +29,7 @@ public class FormVaultMemberManage implements Listener {
         Item balance = Item.get("wolfland:para_bak");
         Item seeMembers = Item.get("wolfland:soruisareti");
         Item quitVault = Item.get(Block.IRON_DOOR);
-        Item vaultOwner = Item.get(Item.PLAYER_HEAD);
+        Item vaultOwner = Item.get("wolfland:tac");
 
         space.setCustomName(" ");
         quitVault.setCustomName(TextFormat.AQUA + "Kasadan Ayrıl");

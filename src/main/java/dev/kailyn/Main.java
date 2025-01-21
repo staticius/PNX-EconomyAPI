@@ -8,6 +8,7 @@ import dev.kailyn.api.EconomyAPI;
 import dev.kailyn.commands.CommandEcoAdmin;
 import dev.kailyn.commands.CommandMenu;
 import dev.kailyn.commands.CommandTopBalance;
+import dev.kailyn.commands.CommandVaultTopBalance;
 import dev.kailyn.database.DatabaseManage;
 import dev.kailyn.forms.FormEcoMenu;
 import dev.kailyn.forms.FormSendMoney;
@@ -72,6 +73,7 @@ public class Main extends PluginBase {
     @Override
     public void onLoad() {
         try {
+
             Registries.ITEM.registerCustomItem(this, ItemVault.class);
             Registries.ITEM.registerCustomItem(this, ItemSpace.class);
             Registries.ITEM.registerCustomItem(this, ItemSeeMembers.class);
@@ -82,6 +84,12 @@ public class Main extends PluginBase {
             Registries.ITEM.registerCustomItem(this, ItemDepositMoney.class);
             Registries.ITEM.registerCustomItem(this, ItemSeeMoney.class);
             Registries.ITEM.registerCustomItem(this, ItemSendMoney.class);
+            Registries.ITEM.registerCustomItem(this, ItemTac.class);
+            Registries.ITEM.registerCustomItem(this, ItemBaltopOne.class);
+            Registries.ITEM.registerCustomItem(this, ItemBaltopTwo.class);
+            Registries.ITEM.registerCustomItem(this, ItemBaltopThree.class);
+            Registries.ITEM.registerCustomItem(this, ItemBaltopOther.class);
+            Registries.ITEM.registerCustomItem(this, ItemVaultTopMoney.class);
 
         } catch (RegisterException e) {
             throw new RuntimeException(e);
@@ -105,7 +113,7 @@ public class Main extends PluginBase {
         this.getServer().getCommandMap().register("ecomenu", new CommandMenu("ecomenu", "Ekonomi Menüsü"));
         this.getServer().getCommandMap().register("ecoadmin", new CommandEcoAdmin("ecoadmin", "Ekonomi admin paneli"));
         this.getServer().getCommandMap().register("topbalance", new CommandTopBalance("topbalance", "En zengin 10 oyuncuyu görüntüle.", "/topbalance"));
-
+        this.getServer().getCommandMap().register("topvbalance", new CommandVaultTopBalance("topvbalance", "En çok bakiyeye sahip 10 kasayı görüntüle"));
     }
 
     private void registerEvents() {

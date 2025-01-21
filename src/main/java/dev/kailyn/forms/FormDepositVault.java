@@ -20,7 +20,7 @@ public class FormDepositVault {
 
         formWindowCustom.addElement(new ElementLabel("Mevcut Bakiyen:"));
         try {
-            formWindowCustom.addElement(new ElementLabel(String.valueOf(DatabaseManage.getBalance(player.getName()))));
+            formWindowCustom.addElement(new ElementLabel(DatabaseManage.formatNumber(DatabaseManage.getBalance(player.getName()))));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

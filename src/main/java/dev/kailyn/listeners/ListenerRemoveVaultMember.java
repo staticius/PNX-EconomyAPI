@@ -26,6 +26,10 @@ public class ListenerRemoveVaultMember implements Listener {
         Player player = event.getPlayer();
         Object response = event.getResponse();
 
+        if (event.getWindow().getResponse() == null) {
+            return;
+        }
+
         // Oyuncu seçme formu
         if (event.getFormID() == FormRemoveVaultMember.REMOVE_MEMBER_FORM_ID) {
             if (event.getWindow() instanceof FormWindowSimple formWindowSimple) {
@@ -38,6 +42,7 @@ public class ListenerRemoveVaultMember implements Listener {
                 FormRemoveVaultMember.openConfirmRemoveForm(player, selectedMember);
             }
         }
+
 
         // Onay formu
         if (event.getFormID() == FormRemoveVaultMember.CONFIRM_REMOVE_FORM_ID) {
